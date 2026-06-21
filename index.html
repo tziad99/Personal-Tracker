@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="theme-color" content="#0a0a0b"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="My Tracker"/>
+<link rel="manifest" href="manifest.json"/>
+<title>Personal Tracker</title>
+<style>
+/* ─── PREMIUM THEME TOKENS ─── */
+:root {
+  /* Dark mode – warm graphite, not blue */
+  --bg:       #0a0a0b;
+  --surface:  #131314;
+  --surface2: #1c1c1e;
+  --surface3: #252527;
+  --border:   #2c2c2e;
+  --border2:  #3a3a3c;
+  --gold:     #c9a84c;
+  --gold-dim: #8a6e28;
+  --gold-glow:rgba(201,168,76,0.14);
+  --red:      #e05555;
+  --amber:    #f5a623;
+  --green:    #30d158;
+  --text:     #f5f5f7;
+  --text-dim: #8e8e93;
+  --text-mute:#48484a;
+  --accent:   #c9a84c;
+  --accent-glow:rgba(201,168,76,0.14);
+  --r:14px; --r-sm:10px; --r-xs:7px;
+}
+[data-theme="light"] {
+  --bg:       #f2f2f7;
+  --surface:  #ffffff;
+  --surface2: #f2f2f7;
+  --surface3: #e5e5ea;
+  --border:   #e5e5ea;
+  --border2:  #c7c7cc;
+  --text:     #1c1c1e;
+  --text-dim: #6d6d72;
+  --text-mute:#aeaeb2;
+  --accent:   #b8932a;
+  --accent-glow:rgba(184,147,42,0.12);
+  --gold-glow:rgba(184,147,42,0.12);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+button{cursor:pointer;border:none;background:none;color:inherit;font:inherit}
+input,select,textarea{font:inherit;color:inherit;background:none}
+svg{display:block}
+
+/* ─── APP SHELL ─── */
+#app{display:flex;flex-direction:column;height:100dvh;max-width:480px;margin:0 auto}
+
+/* ─── HEADER ─── */
+#header{
+  padding:14px 16px 13px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  background:var(--bg);
+  flex-shrink:0;
+  position:relative;
+}
+.logo{font-size:16px;font-weight:800;letter-spacing:.5px;color:var(--text)}
+.logo em{color:var(--gold);font-style:normal}
+#page-title{flex:1;font-size:14px;font-weight:500;color:var(--text-dim);text-align:center;letter-spacing:.2px}
+.date-pill{font-size:11px;color:var(--text-dim);white-space:nowrap;flex-shrink:0}
+#burger-btn{width:34px;height:34px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex-shrink:0;border-radius:8px;background:var(--surface2);border:1px solid var(--border)}
+#burger-btn span{display:block;width:16px;height:1.5px;background:var(--text-dim);border-radius:2px;transition:all .3s}
+
+/* ─── SCROLL ─── */
+#content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 96px}
+#content::-webkit-scrollbar{display:none}
+
+/* ─── BOTTOM NAV ─── */
+#nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;
+  background:var(--bg);
+  border-top:1px solid var(--border);
+  display:flex;padding:10px 0 env(safe-area-inset-bottom,10px);z-index:100;
+}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;color:var(--text-mute);transition:color .2s;font-size:10px;font-weight:500;letter-spacing:.2px}
+.nav-btn.active{color:var(--gold)}
+.nav-btn svg{width:20px;height:20px}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:var(--gold);margin-top:1px;opacity:0;transition:opacity .2s}
+.nav-btn.active .nav-dot{opacity:1}
+
+/* ─── MENU DRAWER ─── */
+#menu-overlay{display:none;position:fixed;inset:0;z-index:300}
+#menu-overlay.open{display:block}
+#menu-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#menu-drawer{position:absolute;top:0;right:0;width:80%;max-width:310px;height:100%;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;animation:slideR .22s ease}
+@keyframes slideR{from{transform:translateX(102%)}to{transform:translateX(0)}}
+#menu-top{padding:52px 20px 18px;border-bottom:1px solid var(--border)}
+#menu-top .ml{font-size:19px;font-weight:800;color:var(--text)}
+#menu-top .ml em{color:var(--gold);font-style:normal}
+#menu-top .ms{font-size:11px;color:var(--text-mute);margin-top:3px;letter-spacing:.3px}
+#menu-list{flex:1;overflow-y:auto;padding:8px 0 20px}
+.msec{font-size:10px;font-weight:700;letter-spacing:1.8px;color:var(--text-mute);padding:18px 20px 7px;text-transform:uppercase}
+.mi{display:flex;align-items:center;gap:13px;padding:12px 20px;cursor:pointer;transition:background .12s;border-left:2px solid transparent}
+.mi:active{background:var(--surface2)}
+.mi.active{background:var(--gold-glow);border-left-color:var(--gold)}
+.mi .ic{width:34px;height:34px;border-radius:9px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:1px solid var(--border)}
+.mi.active .ic{background:var(--gold-glow);border-color:var(--gold-dim)}
+.mi .inf .mn{font-size:13px;font-weight:600}
+.mi .inf .md{font-size:11px;color:var(--text-dim);margin-top:2px}
+.mi.active .inf .mn{color:var(--gold)}
+
+/* ─── CARDS ─── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.card-title{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-mute);margin-bottom:14px}
+.card.gold-edge{border-color:var(--gold-dim);background:linear-gradient(135deg,var(--surface) 80%,var(--gold-glow))}
+
+/* ─── DIVIDER LINE ─── */
+.div-line{height:1px;background:var(--border);margin:2px 0}
+
+/* ─── STAT ROW ─── */
+.stat-row{display:flex;gap:10px;margin-bottom:12px}
+.stat{flex:1;background:var(--surface);border-radius:var(--r-sm);padding:13px 12px;border:1px solid var(--border)}
+.stat .sv{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.stat .sl{font-size:10px;color:var(--text-dim);margin-top:4px;letter-spacing:.2px}
+.stat.ac .sv{color:var(--gold)}
+.stat.am .sv{color:var(--amber)}
+.stat.rd .sv{color:var(--red)}
+.stat.gr .sv{color:var(--green)}
+
+/* ─── GAUGE ─── */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:6px 0 2px}
+.g-track{fill:none;stroke:var(--surface3);stroke-width:9;stroke-linecap:round}
+.g-fill{fill:none;stroke:var(--gold);stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset 1.3s cubic-bezier(.34,1.4,.64,1);filter:drop-shadow(0 0 7px var(--gold))}
+.g-fill.danger{stroke:var(--red);filter:drop-shadow(0 0 7px var(--red))}
+.g-fill.warn{stroke:var(--amber);filter:drop-shadow(0 0 7px var(--amber))}
+.gauge-meta{display:flex;width:100%;margin-top:10px}
+.gm-item{flex:1;text-align:center}
+.gm-item .gv{font-size:14px;font-weight:700;color:var(--gold)}
+.gm-item .gl{font-size:10px;color:var(--text-dim);margin-top:2px}
+
+/* ─── RING ─── */
+.ring-wrap{display:flex;align-items:center;gap:18px}
+.ring-track{fill:none;stroke:var(--surface3);stroke-width:7}
+.ring-fill{fill:none;stroke:var(--gold);stroke-width:7;stroke-linecap:round;transform-origin:center;transform:rotate(-90deg);transition:stroke-dashoffset 1s ease;filter:drop-shadow(0 0 4px var(--gold))}
+.ring-fill.danger{stroke:var(--red)}
+.ri .rb{font-size:22px;font-weight:700}
+.ri .rs{font-size:11px;color:var(--text-dim);margin-top:4px}
+.ri .rg{font-size:11px;color:var(--text-mute);margin-top:5px}
+
+/* ─── BAR CHART ─── */
+.bar-chart{display:flex;align-items:flex-end;gap:5px;height:78px;margin-top:10px}
+.bc{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end}
+.bc .b{width:100%;border-radius:3px 3px 0 0;background:var(--surface3);min-height:3px;transition:height .6s ease}
+.bc.cur .b{background:var(--gold);box-shadow:0 0 10px var(--gold-glow)}
+.bc .ml{font-size:9px;color:var(--text-mute)}
+.bc .al{font-size:9px;color:var(--text-dim)}
+
+/* ─── PROGRESS BAR ─── */
+.pb-wrap{margin-bottom:13px}
+.pb-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.pb-lbl{font-size:13px}
+.pb-val{font-size:11px;color:var(--text-dim)}
+.pb-track{height:5px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.pb-fill{height:100%;border-radius:3px;transition:width .8s ease}
+.pb-fill.ac{background:var(--gold)}
+.pb-fill.am{background:var(--amber)}
+.pb-fill.rd{background:var(--red)}
+
+/* ─── LIST ITEMS ─── */
+.li-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
+.li-row:last-child{border-bottom:none}
+.li-name{font-size:13px}
+.li-val{font-size:13px;font-weight:600;color:var(--text-dim)}
+
+/* ─── FUEL LOG ─── */
+.log-list{display:flex;flex-direction:column;gap:7px}
+.log-item{background:var(--surface);border-radius:var(--r-sm);padding:12px 14px;border:1px solid var(--border);position:relative;overflow:hidden;transition:transform .2s}
+.log-item-inner{display:flex;align-items:center;gap:11px}
+.log-icon{width:34px;height:34px;border-radius:50%;background:var(--gold-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;border:1px solid var(--gold-dim)}
+.log-info{flex:1;min-width:0}
+.log-top{display:flex;justify-content:space-between;align-items:center}
+.log-st{font-size:13px;font-weight:600}
+.log-amt{font-size:14px;font-weight:700;color:var(--gold)}
+.log-tags{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}
+.tag{font-size:10px;color:var(--text-dim);background:var(--surface3);padding:2px 7px;border-radius:20px;border:1px solid var(--border)}
+.tag.amber{color:var(--amber);background:rgba(245,166,35,.1)}
+
+
+
+/* ─── FAB ─── */
+#fab{position:fixed;bottom:74px;right:18px;width:50px;height:50px;border-radius:50%;background:var(--gold);color:#0a0a0b;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(201,168,76,.45);z-index:90;transition:transform .18s;font-size:24px;font-weight:300;line-height:1}
+#fab:active{transform:scale(.9)}
+#fab.hidden{display:none}
+
+/* ─── MODAL ─── */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:400;align-items:flex-end}
+#modal-overlay.open{display:flex}
+#modal{background:var(--surface);border-radius:22px 22px 0 0;padding:0 20px env(safe-area-inset-bottom,22px);width:100%;max-height:88vh;overflow-y:auto;border-top:1px solid var(--border);animation:slideUp .28s cubic-bezier(.34,1.15,.64,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.m-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:14px auto 18px}
+.m-title{font-size:18px;font-weight:700;margin-bottom:20px;letter-spacing:-.3px}
+
+/* ─── FORM FIELDS ─── */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;color:var(--text-dim);margin-bottom:6px;font-weight:600;letter-spacing:.8px;text-transform:uppercase}
+.field input,.field select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px 14px;font-size:15px;color:var(--text);outline:none;-webkit-appearance:none;appearance:none;transition:border-color .2s}
+.field input:focus,.field select:focus{border-color:var(--gold)}
+.field-row{display:flex;gap:10px}
+.field-row .field{flex:1}
+.btn-p{width:100%;background:var(--gold);color:#0a0a0b;font-weight:700;font-size:15px;padding:15px;border-radius:var(--r-sm);margin-top:6px;letter-spacing:.2px;transition:opacity .2s}
+.btn-p:active{opacity:.8}
+.btn-sec{width:100%;background:var(--surface2);color:var(--text-dim);font-weight:600;font-size:14px;padding:13px;border-radius:var(--r-sm);margin-top:8px;border:1px solid var(--border)}
+
+/* ─── ADD ROW ─── */
+.add-row{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)}
+.add-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:13px;color:var(--text);outline:none}
+.add-row input:focus{border-color:var(--gold)}
+.add-row select{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 8px;font-size:13px;color:var(--text);outline:none;-webkit-appearance:none}
+.add-btn{background:var(--gold);color:#0a0a0b;border-radius:var(--r-sm);padding:10px 14px;font-size:13px;font-weight:700;white-space:nowrap;flex-shrink:0}
+
+/* ─── MAINTENANCE ─── */
+.svc-item{background:var(--surface2);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:8px;border:1px solid var(--border)}
+.svc-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.svc-name{font-size:13px;font-weight:600}
+.svc-cost{font-size:13px;font-weight:700;color:var(--gold);white-space:nowrap}
+.svc-meta{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.svc-tag{font-size:10px;color:var(--text-dim);background:var(--surface3);padding:2px 8px;border-radius:20px}
+
+/* ─── INTERVAL ─── */
+.iv-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.iv-item:last-child{border-bottom:none}
+.iv-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.iv-dot.done{background:var(--green)}
+.iv-dot.due{background:var(--amber)}
+.iv-dot.future{background:var(--border2)}
+.iv-info{flex:1}
+.iv-task{font-size:13px}
+.iv-sub{font-size:10px;color:var(--text-dim);margin-top:2px}
+.iv-badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:700;white-space:nowrap}
+.b-done{background:rgba(48,209,88,.12);color:var(--green)}
+.b-due{background:rgba(245,166,35,.12);color:var(--amber)}
+.b-future{background:var(--surface3);color:var(--text-mute)}
+
+/* ─── REQUIREMENTS ─── */
+.req-list{display:flex;flex-direction:column}
+
+.req-item{display:flex;align-items:center;gap:11px;padding:11px 0;background:var(--surface);position:relative;z-index:1;transition:transform .2s ease;cursor:pointer}
+.req-item.swiped{transform:translateX(-70px)}
+.req-ck{width:21px;height:21px;border-radius:6px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.req-ck.done{background:var(--green);border-color:var(--green)}
+.req-ck.done::after{content:'✓';font-size:11px;color:#fff;font-weight:800}
+.req-lbl{flex:1;font-size:13px;transition:color .2s}
+.req-lbl.done{text-decoration:line-through;color:var(--text-mute)}
+.req-price{font-size:11px;color:var(--text-mute);margin-right:4px}
+.prio{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;flex-shrink:0}
+.p1{background:rgba(224,85,85,.12);color:var(--red)}
+.p2{background:rgba(245,166,35,.12);color:var(--amber)}
+.p3{background:rgba(48,209,88,.12);color:var(--green)}
+.p4{background:var(--surface3);color:var(--text-mute)}
+
+/* ─── CLEANING GRID ─── */
+.clean-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:4px}
+.cl-cell{aspect-ratio:1;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;font-weight:600;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .2s;gap:2px}
+.cl-cell .cn{font-size:9px;color:var(--text-mute)}
+.cl-cell.done{background:rgba(48,209,88,.1);border-color:var(--green);color:var(--green)}
+.cl-cell.done .cn{color:rgba(48,209,88,.5)}
+.cl-cell.today{box-shadow:0 0 0 2px var(--gold)}
+
+/* ─── PC BUILD ─── */
+.pc-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.pc-item:last-child{border-bottom:none}
+.pc-cat{font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--gold);text-transform:uppercase;margin-bottom:3px}
+.pc-name{font-size:13px}
+
+/* ─── LOAN CALC ─── */
+.loan-result{background:var(--gold-glow);border:1px solid var(--gold-dim);border-radius:var(--r-sm);padding:14px;margin-top:12px}
+.loan-result .lr-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px solid rgba(201,168,76,.15)}
+.loan-result .lr-row:last-child{border-bottom:none;font-weight:700;font-size:14px;color:var(--gold);padding-top:8px}
+
+/* ─── SETTINGS ─── */
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-lbl{font-size:13px}
+.setting-sub{font-size:11px;color:var(--text-dim);margin-top:2px}
+.setting-val input{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:7px 10px;font-size:14px;font-weight:600;color:var(--text);width:110px;text-align:right;outline:none}
+.setting-val input:focus{border-color:var(--gold)}
+.save-settings-btn{width:100%;background:var(--gold);color:#0a0a0b;font-weight:700;font-size:14px;padding:14px;border-radius:var(--r-sm);margin-top:16px;letter-spacing:.2px}
+
+/* ─── THEME TOGGLE ─── */
+.theme-toggle{display:flex;background:var(--surface2);border-radius:8px;border:1px solid var(--border);overflow:hidden}
+.theme-opt{flex:1;padding:7px 12px;font-size:12px;font-weight:600;text-align:center;transition:all .2s;color:var(--text-dim)}
+.theme-opt.active{background:var(--gold);color:#0a0a0b}
+
+/* ─── TOAST ─── */
+#toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);color:var(--text);font-size:13px;font-weight:600;padding:12px 22px;border-radius:24px;opacity:0;transition:opacity .25s,transform .25s;z-index:9999;white-space:nowrap;pointer-events:none;border:1px solid var(--border2);box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+
+/* ─── PAGES ─── */
+.page{display:none}
+.page.active{display:block}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sec-hd h2{font-size:14px;font-weight:700}
+.see-all{font-size:12px;color:var(--gold)}
+
+/* ─── EMPTY ─── */
+.empty{text-align:center;padding:36px 20px;color:var(--text-mute);font-size:13px}
+.empty-icon{font-size:36px;margin-bottom:10px}
+
+/* ─── EDIT INLINE ─── */
+.edit-btn{background:none;border:none;color:var(--text-mute);padding:4px;cursor:pointer;flex-shrink:0;transition:color .2s}
+.edit-btn:active{color:var(--gold)}
+.pen-svg{width:14px;height:14px;display:inline-block;vertical-align:middle}
+.edit-modal-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)}
+.edit-modal-row:last-child{border-bottom:none}
+.edit-modal-lbl{font-size:12px;color:var(--text-dim);width:90px;flex-shrink:0}
+.edit-modal-val{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:14px;color:var(--text);outline:none}
+.edit-modal-val:focus{border-color:var(--gold)}
+
+
+/* ─── TRIP PRESETS ─── */
+.trip-preset{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;text-align:left;font-size:12px;font-weight:600;line-height:1.8;cursor:pointer;transition:border-color .2s;display:flex;flex-direction:column;gap:1px}
+.trip-preset:active{border-color:var(--gold)}
+.trip-preset span{display:block;font-size:10px;font-weight:400;line-height:1.5}
+
+
+/* ─── DELETE BUTTON IN MODAL ─── */
+.btn-del{width:100%;background:none;color:var(--red);font-weight:600;font-size:14px;padding:13px;border-radius:var(--r-sm);margin-top:8px;border:1px solid var(--red);transition:background .2s}
+.btn-del:active{background:rgba(224,85,85,.1)}
+
+
+/* ─── EXPORT / IMPORT ─── */
+.btn-export{width:100%;background:var(--surface2);color:var(--text);font-weight:600;font-size:14px;padding:13px;border-radius:var(--r-sm);margin-top:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:border-color .2s}
+.btn-export:active{border-color:var(--gold)}
+.btn-export.danger{color:var(--red);border-color:var(--red)}
+#import-file{display:none}
+
+
+/* ─── CONFIRM DELETE ─── */
+.confirm-overlay{position:absolute;inset:0;background:rgba(13,13,14,.93);border-radius:22px 22px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px 24px;z-index:10;backdrop-filter:blur(4px)}
+.confirm-msg{text-align:center;font-size:15px;font-weight:600;line-height:1.5}
+.confirm-msg span{display:block;font-size:12px;color:var(--text-dim);margin-top:6px;font-weight:400}
+.confirm-btns{display:flex;gap:10px;width:100%}
+.confirm-btns button{flex:1;padding:13px;border-radius:var(--r-sm);font-size:14px;font-weight:700;cursor:pointer;border:none}
+.confirm-cancel{background:var(--surface2);color:var(--text)}
+.confirm-go{background:var(--red);color:#fff}
+#modal{position:relative}
+
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HEADER -->
+<div id="header">
+  <div class="logo">MY<em>.</em>T</div>
+  <div id="page-title">Dashboard</div>
+  <div class="date-pill" id="date-badge"></div>
+  <button id="burger-btn" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+
+<!-- CONTENT -->
+<div id="content">
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="page active" id="page-dashboard">
+    <div class="card gold-edge">
+      <div class="card-title">⛽ Fuel This Month</div>
+      <div class="gauge-wrap">
+        <svg width="198" height="115" viewBox="0 0 200 115" style="overflow:visible">
+          <path class="g-track" d="M20 108 A80 80 0 0 1 180 108"/>
+          <path class="g-fill" id="gauge-fill" d="M20 108 A80 80 0 0 1 180 108" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+          <text text-anchor="middle" x="100" y="86" style="font-size:26px;font-weight:800;fill:var(--text)" id="gauge-val">0</text>
+          <text text-anchor="middle" x="100" y="104" style="font-size:11px;fill:var(--text-dim)">AED this month</text>
+        </svg>
+        <div class="gauge-meta" id="gauge-meta"></div>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat ac"><div class="sv" id="d-salary">—</div><div class="sl">Salary</div></div>
+      <div class="stat am"><div class="sv" id="d-spent">—</div><div class="sl">Monthly Spend</div></div>
+      <div class="stat" id="d-scard"><div class="sv" id="d-saving">—</div><div class="sl">Actual Saving</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">💰 Savings Health</div>
+      <div class="ring-wrap">
+        <svg width="76" height="76" viewBox="0 0 80 80">
+          <circle class="ring-track" cx="40" cy="40" r="30"/>
+          <circle class="ring-fill" id="saving-ring" cx="40" cy="40" r="30" stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+        </svg>
+        <div class="ri">
+          <div class="rb" id="saving-pct">0%</div>
+          <div class="rs">of 20% target</div>
+          <div class="rg" id="saving-gap"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📈 Monthly Fuel Spend</div>
+      <div class="bar-chart" id="mini-chart"></div>
+    </div>
+    <div class="sec-hd"><h2>Recent Fill-ups</h2><span class="see-all" onclick="switchPage('fuel')">See all →</span></div>
+    <div class="log-list" id="recent-fills"></div>
+  </div>
+
+  <!-- ══ FUEL ══ -->
+  <div class="page" id="page-fuel">
+    <div class="stat-row">
+      <div class="stat ac"><div class="sv" id="f-yr">—</div><div class="sl">This Year</div></div>
+      <div class="stat am"><div class="sv" id="f-avg">—</div><div class="sl">Avg/Month</div></div>
+      <div class="stat"><div class="sv" id="f-cnt">—</div><div class="sl">Fill-ups</div></div>
+    </div>
+    <div class="pill-row" id="year-pills" style="display:flex;gap:8px;overflow-x:auto;margin-bottom:8px;scrollbar-width:none"></div>
+    <div class="pill-row" id="month-pills" style="display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none"></div>
+    <div class="log-list" id="fuel-log-list"></div>
+  </div>
+
+  <!-- ══ BUDGET ══ -->
+  <div class="page" id="page-budget">
+    <div class="card"><div class="card-title">📊 Monthly Snapshot</div><div id="bgt-snap"></div></div>
+    <div class="card">
+      <div class="card-title">🧾 Spending Breakdown</div>
+      <div id="bgt-break"></div>
+      <div class="add-row" id="bgt-add-row">
+        <input id="bgt-new-name" placeholder="Category name"/>
+        <input id="bgt-new-amt" placeholder="AED/mo" type="number" style="width:90px"/>
+        <button class="add-btn" onclick="addBudgetItem()">Add</button>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">🚗 Car Cost Detail</div><div id="car-break"></div></div>
+  </div>
+
+  <!-- ══ CLEANING ══ -->
+  <div class="page" id="page-cleaning">
+    <div class="stat-row">
+      <div class="stat gr"><div class="sv" id="cl-done">—</div><div class="sl">Done</div></div>
+      <div class="stat"><div class="sv" id="cl-total">—</div><div class="sl">Sessions</div></div>
+      <div class="stat ac"><div class="sv" id="cl-cost">—</div><div class="sl">Cost (AED)</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🧼 Cleaning Grid – Tap to Mark</div>
+      <div class="clean-grid" id="clean-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Subscription Info</div>
+      <div class="li-row"><span class="li-name">Price per session</span><span class="li-val" id="cl-price-disp">—</span></div>
+      <div class="li-row"><span class="li-name">Monthly subscription</span><span class="li-val" id="cl-sub-disp">—</span></div>
+      <div class="li-row"><span class="li-name">Sessions per month</span><span class="li-val" id="cl-sess-disp">—</span></div>
+      <div class="li-row"><span class="li-name">Schedule start</span><span class="li-val" id="cl-start-disp">—</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">⚙️ Cleaning Settings</div>
+      <div class="setting-row">
+        <div><div class="setting-lbl">Start Date</div></div>
+        <div class="setting-val"><input type="date" id="s-clean-start" style="width:auto;text-align:left"/></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-lbl">Sessions / Month</div></div>
+        <div class="setting-val"><input type="number" id="s-clean-sess"/></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-lbl">Monthly Cost</div><div class="setting-sub">AED</div></div>
+        <div class="setting-val"><input type="number" id="s-clean-price"/></div>
+      </div>
+      <button class="save-settings-btn" style="margin-top:14px" onclick="saveCleaningSettings()">Save Cleaning Settings</button>
+      <button class="btn-del" style="margin-top:8px;width:100%;padding:13px;border-radius:var(--r-sm)" onclick="resetCleanSessions()">🔄 Reset All Sessions</button>
+    </div>
+  </div>
+
+  <!-- ══ MAINTENANCE ══ -->
+  <div class="page" id="page-maintenance">
+    <div class="card" style="padding:12px 16px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--text-dim);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px">Current Mileage</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input type="number" id="s-km" inputmode="numeric"
+              style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:8px 12px;font-size:16px;font-weight:700;color:var(--text);outline:none;width:140px"
+              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+            <span style="font-size:13px;color:var(--text-dim)">km</span>
+          </div>
+        </div>
+        <button onclick="saveKM()" style="background:var(--gold);color:#0a0a0b;font-weight:700;font-size:13px;padding:10px 16px;border-radius:var(--r-sm);border:none;cursor:pointer;white-space:nowrap">Save KM</button>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat ac"><div class="sv" id="m-km">—</div><div class="sl">Avg/Year Spend</div></div>
+      <div class="stat ac"><div class="sv" id="m-next">—</div><div class="sl">Next Service</div></div>
+      <div class="stat am"><div class="sv" id="m-total">—</div><div class="sl">Total Spent</div></div>
+    </div>
+    <div class="card"><div class="card-title">📅 Next Service Intervals</div><div id="svc-intervals"></div></div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0">🔧 Service History</div>
+        <select id="svc-yr-filter" onchange="renderMaintenance()" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:5px 8px;font-size:12px;color:var(--text-dim);-webkit-appearance:none;outline:none">
+          <option value="">All Years</option>
+        </select>
+      </div>
+      <div id="svc-history"></div>
+      <div class="add-row" style="flex-wrap:wrap;gap:6px">
+        <input id="svc-name" placeholder="Service name" style="flex:2;min-width:120px"/>
+        <input id="svc-km" placeholder="KM" type="number" style="width:80px"/>
+        <input id="svc-cost" placeholder="AED" type="number" style="width:70px"/>
+        <input id="svc-from" placeholder="From" style="width:90px"/>
+        <button class="add-btn" onclick="addService()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ REQUIREMENTS ══ -->
+  <div class="page" id="page-checklist">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0">🔨 Issues / Fixes</div>
+        <div id="iss-progress" style="font-size:11px;color:var(--text-dim)"></div>
+      </div>
+      <div style="height:4px;background:var(--surface3);border-radius:2px;margin-bottom:14px;overflow:hidden">
+        <div id="iss-progress-bar" style="height:100%;background:var(--green);border-radius:2px;transition:width .6s ease;width:0%"></div>
+      </div>
+      <div class="req-list" id="req-issues"></div>
+      <div class="add-row">
+        <input id="iss-new" placeholder="New issue…"/>
+        <select id="iss-prio" style="width:70px">
+          <option value="1">P1</option><option value="2">P2</option>
+          <option value="3">P3</option><option value="4">P4</option>
+        </select>
+        <button class="add-btn" onclick="addReq('issues')">Add</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0">✨ Mods Wishlist</div>
+        <div id="mod-progress" style="font-size:11px;color:var(--text-dim)"></div>
+      </div>
+      <div style="height:4px;background:var(--surface3);border-radius:2px;margin-bottom:14px;overflow:hidden">
+        <div id="mod-progress-bar" style="height:100%;background:var(--gold);border-radius:2px;transition:width .6s ease;width:0%"></div>
+      </div>
+      <div class="req-list" id="req-mods"></div>
+      <div class="add-row" style="flex-wrap:wrap;gap:6px">
+        <input id="mod-new" placeholder="New mod…" style="flex:2;min-width:120px"/>
+        <input id="mod-price" placeholder="AED" type="number" style="width:70px"/>
+        <select id="mod-prio" style="width:70px">
+          <option value="1">P1</option><option value="2">P2</option>
+          <option value="3">P3</option><option value="4">P4</option>
+        </select>
+        <button class="add-btn" onclick="addReq('mods')">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ LOAN CALC ══ -->
+  <div class="page" id="page-loan">
+    <div class="card gold-edge">
+      <div class="card-title">🚘 Car Loan Calculator</div>
+      <div class="field"><label>Car Price (AED)</label><input type="number" id="lc-price" value="60000" oninput="calcLoan()"/></div>
+      <div class="field-row">
+        <div class="field"><label>Down Payment %</label><input type="number" id="lc-dp" value="20" oninput="calcLoan()"/></div>
+        <div class="field"><label>Years</label><input type="number" id="lc-years" value="5" oninput="calcLoan()"/></div>
+      </div>
+      <div class="field"><label>Bank Interest % /year</label><input type="number" id="lc-rate" value="3.8427" step="0.01" oninput="calcLoan()"/></div>
+      <div class="loan-result" id="loan-result"></div>
+    </div>
+    <div class="card" id="reg-renewal-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0">📋 Annual Renewal Costs</div>
+        <button onclick="resetRegCosts('renewal')" style="font-size:11px;color:var(--gold);background:none;border:none;cursor:pointer;padding:0">↺ Reset</button>
+      </div>
+      <div id="reg-renewal-rows"></div>
+    </div>
+    <div class="card" id="reg-first-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0">📋 First-Time Registration</div>
+        <button onclick="resetRegCosts('first')" style="font-size:11px;color:var(--gold);background:none;border:none;cursor:pointer;padding:0">↺ Reset</button>
+      </div>
+      <div id="reg-first-rows"></div>
+    </div>
+  </div>
+
+
+  <!-- ══ SETTINGS ══ -->
+  <div class="page" id="page-settings">
+    <div class="card">
+      <div class="card-title">🌗 Appearance</div>
+      <div class="setting-row">
+        <div><div class="setting-lbl">Theme</div></div>
+        <div class="theme-toggle" id="theme-toggle">
+          <div class="theme-opt active" onclick="setTheme('dark')">Dark</div>
+          <div class="theme-opt" onclick="setTheme('light')">Light</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">💰 Finances</div>
+      <div class="setting-row">
+        <div><div class="setting-lbl">Monthly Salary</div><div class="setting-sub">AED</div></div>
+        <div class="setting-val"><input type="number" id="s-salary"/></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-lbl">Savings Target</div><div class="setting-sub">%</div></div>
+        <div class="setting-val"><input type="number" id="s-save-pct"/></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-lbl">Fuel Budget</div><div class="setting-sub">AED / month</div></div>
+        <div class="setting-val"><input type="number" id="s-fuel-bgt"/></div>
+      </div>
+    </div>
+
+    <button class="save-settings-btn" onclick="saveSettings()">Save Settings</button>
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">💾 Data Backup</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;line-height:1.6">Export all your data as a JSON file. Import it on a new device or after clearing browser storage.</div>
+      <button class="btn-export" onclick="exportData()">⬇️ Export All Data</button>
+      <label class="btn-export" for="import-file" style="margin-top:8px;cursor:pointer">⬆️ Import Data</label>
+      <input type="file" id="import-file" accept=".json" onchange="importData(event)"/>
+    </div>
+    <div style="height:10px"></div>
+  </div>
+
+
+  <!-- ══ TRIP CALCULATOR ══ -->
+  <div class="page" id="page-trip">
+    <div class="card gold-edge">
+      <div class="card-title">🗺️ Trip Cost Calculator</div>
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px;background:var(--surface2);border-radius:var(--r-sm);padding:10px 14px;border:1px solid var(--border);justify-content:space-between">
+        <div id="fuel-price-box" style="display:flex;flex-wrap:wrap;gap:8px;font-size:11px;flex:1">
+          <span style="color:var(--text-mute)">Loading prices…</span>
+        </div>
+        <button onclick="fetchLiveFuelPrices()" style="font-size:11px;color:var(--gold);background:none;border:none;cursor:pointer;white-space:nowrap;padding:0 4px" title="Refresh prices">↺ Refresh</button>
+      </div>
+      <div class="field"><label>Distance (KM)</label><input type="number" id="tr-dist" placeholder="e.g. 120" inputmode="decimal" oninput="calcTrip()"/></div>
+      <div class="field">
+        <label>Fuel Type</label>
+        <select id="tr-fuel" onchange="calcTrip()">
+          <option value="3.95">Super 98 — AED 3.95/L</option>
+          <option value="3.83">Special 95 — AED 3.83/L</option>
+          <option value="3.76">E-Plus 91 — AED 3.76/L</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Fuel Consumption</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="number" id="tr-cons" placeholder="e.g. 9.5" inputmode="decimal" oninput="calcTrip()" value="9.5"
+            style="flex:1;min-width:0;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px 14px;font-size:15px;color:var(--text);outline:none"/>
+          <select id="tr-cons-unit" onchange="calcTrip()"
+            style="width:100px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px 10px;font-size:14px;color:var(--text);-webkit-appearance:none;outline:none">
+            <option value="l100">L/100km</option>
+            <option value="kml">km/L</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Salik / Tolls (AED)</label><input type="number" id="tr-salik" placeholder="e.g. 8" inputmode="decimal" oninput="calcTrip()" value="0"/></div>
+      <div class="field"><label>Round Trip?</label>
+        <select id="tr-round" onchange="calcTrip()">
+          <option value="1">One Way</option>
+          <option value="2">Round Trip (×2)</option>
+        </select>
+      </div>
+      <div id="trip-result" style="margin-top:8px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">💡 Quick Presets</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="trip-presets">
+        <button class="trip-preset" onclick="setTripPreset(60,0,6.5,'kml','1')">
+          🏙️ Commute<br><span style="color:var(--text-dim)">60km · No Salik</span><span style="color:var(--text-mute)">6.5 km/L · One way</span>
+        </button>
+        <button class="trip-preset" onclick="setTripPreset(40,12,8,'kml','1')">
+          🛣️ Commute<br><span style="color:var(--text-dim)">40km · 2× Salik</span><span style="color:var(--text-mute)">8 km/L · One way</span>
+        </button>
+        <button class="trip-preset" onclick="setTripPreset(80,0,5,'kml','1')">
+          🏎️ Sport Drive<br><span style="color:var(--text-dim)">80km · No Salik</span><span style="color:var(--text-mute)">5 km/L · Push it</span>
+        </button>
+        <button class="trip-preset" onclick="setTripPreset(120,0,7,'kml','2')">
+          🌴 Dubai→Abu Dhabi<br><span style="color:var(--text-dim)">120km · Round trip</span><span style="color:var(--text-mute)">7 km/L · Super 98</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div><!-- end content -->
+
+<!-- BOTTOM NAV -->
+<nav id="nav">
+  <button class="nav-btn active" onclick="switchPage('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard<div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" onclick="switchPage('fuel')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 22V8a2 2 0 012-2h6a2 2 0 012 2v14"/><path d="M13 12h3a2 2 0 012 2v4a1 1 0 001 1h0a1 1 0 001-1V9l-3-3"/><path d="M3 22h10"/><line x1="5" y1="11" x2="11" y2="11"/></svg>
+    Fuel<div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" onclick="switchPage('budget')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/></svg>
+    Budget<div class="nav-dot"></div>
+  </button>
+</nav>
+</div><!-- end app -->
+
+<!-- BURGER DRAWER -->
+<div id="menu-overlay" onclick="handleMenuBg(event)">
+  <div id="menu-backdrop"></div>
+  <div id="menu-drawer">
+    <div id="menu-top">
+      <div class="ml">MY<em>.</em>TRACKER</div>
+      <div class="ms">Personal Dashboard</div>
+    </div>
+    <div id="menu-list">
+      <div class="msec">Main</div>
+      <div class="mi active" id="mi-dashboard" onclick="menuNav('dashboard')"><div class="ic">📊</div><div class="inf"><div class="mn">Dashboard</div><div class="md">Overview & fuel gauge</div></div></div>
+      <div class="mi" id="mi-fuel" onclick="menuNav('fuel')"><div class="ic">⛽</div><div class="inf"><div class="mn">Fuel Log</div><div class="md">Fill-ups & trends</div></div></div>
+      <div class="mi" id="mi-budget" onclick="menuNav('budget')"><div class="ic">💰</div><div class="inf"><div class="mn">Budget</div><div class="md">Salary & spending</div></div></div>
+      <div class="msec">Car</div>
+      <div class="mi" id="mi-cleaning" onclick="menuNav('cleaning')"><div class="ic">🧼</div><div class="inf"><div class="mn">Car Cleaning</div><div class="md">Subscription tracker</div></div></div>
+      <div class="mi" id="mi-maintenance" onclick="menuNav('maintenance')"><div class="ic">🔧</div><div class="inf"><div class="mn">Maintenance</div><div class="md">Service history & intervals</div></div></div>
+      <div class="mi" id="mi-checklist" onclick="menuNav('checklist')"><div class="ic">📋</div><div class="inf"><div class="mn">Checklist</div><div class="md">Fixes & mods wishlist</div></div></div>
+      <div class="mi" id="mi-loan" onclick="menuNav('loan')"><div class="ic">🚘</div><div class="inf"><div class="mn">Loan Calculator</div><div class="md">Car finance & registration</div></div></div>
+      <div class="mi" id="mi-trip" onclick="menuNav('trip')"><div class="ic">🗺️</div><div class="inf"><div class="mn">Trip Calculator</div><div class="md">Distance · fuel · salik cost</div></div></div>
+      <div class="msec">Other</div>
+      <div class="mi" id="mi-settings" onclick="menuNav('settings')"><div class="ic">⚙️</div><div class="inf"><div class="mn">Settings</div><div class="md">Salary, cleaning, theme</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button id="fab" onclick="openFuelModal()">+</button>
+
+<!-- MODAL -->
+<div id="modal-overlay" onclick="closeModalBg(event)">
+  <div id="modal">
+    <div class="m-handle"></div>
+    <div class="m-title" id="modal-title">Log Fill-up</div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+//  DEFAULT SETTINGS
+// ═══════════════════════════════════════
+const DEFAULTS = {
+  salary: 8700,
+  savePct: 20,
+  fuelBudget: 1000,
+  cleanStart: '2026-06-19',
+  cleanSess: 15,
+  cleanPrice: 94.5,
+  currentKM: 101000,
+  theme: 'dark'
+};
+
+// ═══════════════════════════════════════
+//  SEED DATA
+// ═══════════════════════════════════════
+const SEED_FUEL = [
+  {date:"2024-08-12",type:"Special",station:"Emarat",amount:50.0},
+  {date:"2024-08-12",type:"Super",station:"Adnoc",amount:122.55},
+  {date:"2024-08-15",type:"Super",station:"Eppco",amount:50.0},
+  {date:"2024-08-15",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2024-08-17",type:"Super",station:"Adnoc",amount:175.01},
+  {date:"2024-08-21",type:"Super",station:"Adnoc",amount:170.01},
+  {date:"2024-08-25",type:"Super",station:"Adnoc",amount:178.01},
+  {date:"2024-08-30",type:"Super",station:"Adnoc",amount:168.79},
+  {date:"2024-09-03",type:"Super",station:"Adnoc",amount:200.0},
+  {date:"2024-09-07",type:"Super",station:"Adnoc",amount:167.02},
+  {date:"2024-09-10",type:"Super",station:"Adnoc",amount:145.01},
+  {date:"2024-09-13",type:"Super",station:"Adnoc",amount:167.39},
+  {date:"2024-09-17",type:"Super",station:"Adnoc",amount:244.01},
+  {date:"2024-09-23",type:"Super",station:"Adnoc",amount:150.02},
+  {date:"2024-09-27",type:"Super",station:"Adnoc",amount:160.02},
+  {date:"2024-10-01",type:"Super",station:"Adnoc",amount:159.01},
+  {date:"2024-10-04",type:"Super",station:"Adnoc",amount:150.0},
+  {date:"2024-10-07",type:"Super",station:"Adnoc",amount:151.06},
+  {date:"2024-10-08",type:"Super",station:"Adnoc",amount:50.0},
+  {date:"2024-10-09",type:"Super",station:"Adnoc",amount:153.0},
+  {date:"2024-10-12",type:"Special",station:"Adnoc",amount:80.0},
+  {date:"2024-10-16",type:"Super",station:"Eppco",amount:50.0},
+  {date:"2024-10-17",type:"Super",station:"Adnoc",amount:152.0},
+  {date:"2024-10-17",type:"Super",station:"Enoc",amount:40.0},
+  {date:"2024-10-17",type:"Super",station:"Adnoc",amount:128.09},
+  {date:"2024-10-24",type:"Super",station:"Adnoc",amount:150.0},
+  {date:"2024-10-26",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2024-10-27",type:"Super",station:"Adnoc",amount:110.02},
+  {date:"2024-11-01",type:"Super",station:"Adnoc",amount:140.06},
+  {date:"2024-11-05",type:"Super",station:"Adnoc",amount:122.01},
+  {date:"2024-11-08",type:"Super",station:"Adnoc",amount:155.0},
+  {date:"2024-11-14",type:"Super",station:"Adnoc",amount:145.0},
+  {date:"2024-11-18",type:"Super",station:"Adnoc",amount:158.04},
+  {date:"2024-11-22",type:"Super",station:"Adnoc",amount:157.0},
+  {date:"2024-12-01",type:"Super",station:"Adnoc",amount:135.02},
+  {date:"2024-12-06",type:"Super",station:"Adnoc",amount:146.0},
+  {date:"2024-12-13",type:"Super",station:"Adnoc",amount:150.02},
+  {date:"2024-12-17",type:"Super",station:"Enoc",amount:50.0},
+  {date:"2024-12-18",type:"Super",station:"Adnoc",amount:145.01},
+  {date:"2024-12-19",type:"Super",station:"Emarat",amount:50.0},
+  {date:"2024-12-20",type:"Super",station:"Adnoc",amount:139.0},
+  {date:"2024-12-24",type:"Super",station:"Adnoc",amount:133.01},
+  {date:"2025-01-01",type:"Super",station:"Adnoc",amount:140.0},
+  {date:"2025-01-06",type:"Super",station:"Adnoc",amount:147.0},
+  {date:"2025-01-11",type:"Super",station:"Adnoc",amount:126.01},
+  {date:"2025-01-15",type:"Super",station:"Adnoc",amount:122.03},
+  {date:"2025-01-19",type:"Super",station:"Adnoc",amount:133.52},
+  {date:"2025-01-22",type:"Super",station:"Adnoc",amount:95.03},
+  {date:"2025-01-25",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-01-28",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-01-31",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-02-02",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-02-07",type:"Super",station:"Enoc",amount:50.0},
+  {date:"2025-02-09",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-02-11",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-02-15",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-02-18",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-02-19",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-02-21",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-02-24",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-03-01",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-03-04",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-03-07",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-03-10",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-03-13",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-03-15",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-03-16",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-03-18",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-03-23",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-03-27",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-03-31",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-04-04",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-04-09",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-04-11",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-04-13",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-04-20",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-04-23",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-04-25",type:"Super",station:"Enoc",amount:30.0},
+  {date:"2025-04-26",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-04-30",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-05-03",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-05-05",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-05-07",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-05-10",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-05-12",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-05-14",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-05-16",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-05-20",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-05-23",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-05-25",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-06-02",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-06-04",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-06-08",type:"Super",station:"Enoc",amount:30.0},
+  {date:"2025-06-09",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-06-11",type:"Super",station:"Enoc",amount:30.0},
+  {date:"2025-06-12",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-06-14",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-06-17",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-06-20",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-06-23",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-06-26",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-06-29",type:"Super",station:"Adnoc",amount:120.0},
+  {date:"2025-07-01",type:"Super",station:"Adnoc",amount:105.01},
+  {date:"2025-07-04",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-07-08",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-07-11",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-07-14",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-07-17",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-07-19",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-07-22",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-07-24",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-07-30",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-08-01",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-08-04",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-08-07",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-08-09",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-08-12",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-08-15",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-08-16",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-08-19",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-08-21",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-08-23",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-08-26",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-08-28",type:"Super",station:"Enoc",amount:50.0},
+  {date:"2025-08-29",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-09-01",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-09-03",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-09-07",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-09-12",type:"Super",station:"Enoc",amount:50.0},
+  {date:"2025-09-13",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-09-15",type:"Super",station:"Enoc",amount:30.0},
+  {date:"2025-09-15",type:"Super",station:"Adnoc",amount:137.81},
+  {date:"2025-09-25",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-10-02",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-10-07",type:"Special",station:"Adnoc",amount:80.0},
+  {date:"2025-10-11",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-10-15",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-10-17",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-10-20",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-10-24",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-10-29",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-10-31",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-11-02",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-11-06",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-11-10",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-11-13",type:"Super",station:"Adnoc",amount:100.0,note:"paid 95 from points!"},
+  {date:"2025-11-17",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2025-11-20",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-11-21",type:"Super",station:"Enoc",amount:50.0},
+  {date:"2025-11-24",type:"Super",station:"Enoc",amount:50.0},
+  {date:"2025-11-27",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-11-29",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-12-01",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-12-04",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-12-06",type:"Super",station:"Enoc",amount:100.0},
+  {date:"2025-12-08",type:"Special",station:"Enoc",amount:50.0},
+  {date:"2025-12-12",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-12-16",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2025-12-20",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-01-01",type:"Super",station:"Adnoc",amount:200.0},
+  {date:"2026-01-05",type:"Special",station:"Enoc",amount:50.0},
+  {date:"2026-01-09",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-01-12",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-01-14",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-01-18",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-01-20",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-01-24",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-01-27",type:"Super",station:"Adnoc",amount:180.0},
+  {date:"2026-02-01",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-02-04",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-02-06",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-02-08",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-02-11",type:"Super",station:"Enoc",amount:50.0},
+  {date:"2026-02-13",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2026-02-16",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-02-18",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2026-02-21",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-02-25",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-02-27",type:"Super",station:"Adnoc",amount:90.03},
+  {date:"2026-03-09",type:"Super",station:"Adnoc",amount:80.0},
+  {date:"2026-03-18",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-03-28",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-03-29",type:"Super",station:"Emarat",amount:111.89},
+  {date:"2026-04-04",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-04-06",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-04-09",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-04-12",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-04-14",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-04-18",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-04-20",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-04-22",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-04-23",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-04-25",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-04-28",type:"Super",station:"Adnoc",amount:192.01},
+  {date:"2026-05-02",type:"Special",station:"Adnoc",amount:100.0},
+  {date:"2026-05-04",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-05-06",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-05-09",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-05-11",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-05-13",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-05-16",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-05-20",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-05-26",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-05-29",type:"Super",station:"Adnoc",amount:145.01},
+  {date:"2026-06-03",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-06-05",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-06-07",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-06-09",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-06-12",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-06-15",type:"Super",station:"Adnoc",amount:100.0},
+  {date:"2026-06-17",type:"Super",station:"Adnoc",amount:100.0},
+];
+const SEED_SPEND=[
+  {name:"Car Expenses",monthly:3008.8},{name:"Rent",monthly:3000},{name:"Pocket Money",monthly:1000},
+  {name:"Food at Work",monthly:800},{name:"Phone Bill",monthly:60},{name:"Clothing",monthly:100},{name:"Barber",monthly:50},
+];
+const SEED_CAR=[
+  {name:"Car Loan",monthly:1470.3},{name:"Petrol",monthly:1000},{name:"Salik",monthly:360},{name:"Car Wash",monthly:178.5},
+];
+const SEED_SVC=[
+  {name:"Brake pads + axle repair",km:52000,date:"2024-09-11",cost:620,from:"SHJ Garage"},
+  {name:"Oil change",km:52000,date:"2024-09-12",cost:204.05,from:"Total SHJ"},
+  {name:"Oil change",km:60000,date:"2024-12-17",cost:164.37,from:"Adnoc (53% off)"},
+  {name:"Oil change",km:70000,date:"2025-04-08",cost:344.5,from:"Total SHJ"},
+  {name:"Tyres – Pirelli PZero MOE",km:75355,date:"2025-06-13",cost:3460,from:"Gulf Coast SHJ"},
+  {name:"AGM Battery (95ah)",km:79900,date:"2025-08-15",cost:650,from:""},
+  {name:"Oil change",km:80060,date:"2025-08-17",cost:305.9,from:"Total SHJ"},
+  {name:"Major service",km:90300,date:"2025-12-10",cost:2354,from:"Lezof"},
+  {name:"Brake pads (Powerstop)",km:90400,date:"2025-12-12",cost:625,from:"Brakes.ae"},
+  {name:"Brake rotors (Powerstop)",km:91100,date:"2026-01-01",cost:1100,from:"Dr. Brakes"},
+  {name:"Oil change",km:99190,date:"2026-04-23",cost:334.95,from:"Total SHJ"},
+];
+const SEED_ISSUES=[
+  {done:false,label:"Seatbelts (not moving up/down)",prio:1},
+  {done:true,label:"Brake pads",prio:1},{done:true,label:"Door speaker rattle",prio:2},
+  {done:false,label:"Body Polish",prio:2},{done:false,label:"Sensors volume too low",prio:3},
+  {done:true,label:"Number plate alignment",prio:4},{done:false,label:"Fix bushings",prio:null},
+  {done:true,label:"Repaint calipers",prio:null},{done:false,label:"Tint",prio:null},
+];
+const SEED_MODS=[
+  {done:false,label:"Lights & radar PPF",prio:1,price:300},{done:true,label:"Ducktail",prio:1,price:900},
+  {done:false,label:"Blackout / dechrome",prio:2,price:300},{done:false,label:"Lowering springs",prio:2,price:1500},
+  {done:false,label:"Downpipes / exhaust",prio:2,price:2000},{done:false,label:"Snorkels",prio:3,price:1300},
+  {done:false,label:"Splitter",prio:3,price:1000},{done:false,label:"Spacers",prio:4,price:800},
+  {done:false,label:"HKS BOV",prio:4,price:1000},{done:false,label:"Hood vents",prio:null,price:null},
+  {done:true,label:"Amber lights",prio:null,price:200},
+];
+const PC_SPECS=[
+  {cat:"CPU",name:"Intel Core i7-6700K 4 GHz Quad-Core"},
+  {cat:"CPU Cooler",name:"NZXT Kraken X62 Liquid Cooler"},
+  {cat:"Motherboard",name:"Asus TUF Z270 MARK 1 ATX LGA1151"},
+  {cat:"Memory",name:"G.Skill Trident Z RGB 16 GB (2×8 GB) DDR4-3200"},
+  {cat:"Storage",name:"WD Caviar Black 1 TB HDD + Samsung 850 Evo 250 GB SSD"},
+  {cat:"GPU",name:"EVGA GeForce GTX 1080 Ti 11 GB"},
+  {cat:"Case",name:"Phanteks Enthoo EVOLV ATX TG"},
+  {cat:"PSU",name:"SeaSonic X 850 W 80+ Gold Modular"},
+  {cat:"Fans",name:"NZXT Aer RGB 120 mm × 3"},
+  {cat:"Monitor",name:"MSI Pro MP251 25\" IPS FHD 100 Hz"},
+];
+const SVC_INTERVALS=[
+  {task:"Oil & Filter Change",every:"10,000 km",next:110000},
+  {task:"Cabin Air Filter",every:"30,000 km",next:110000},
+  {task:"Drive Belts & Hoses",every:"30,000 km",next:110000},
+  {task:"Brake Fluid + Spark Plugs",every:"60,000 km",next:150000},
+  {task:"Fuel System + Diff Fluid",every:"60,000 km",next:150000},
+  {task:"Transmission + Coolant Flush",every:"60,000 km",next:210000},
+  {task:"Air Intake Filters",every:"60,000 km",next:270000},
+];
+
+
+// ═══════════════════════════════════════
+//  STATION LOGOS
+// ═══════════════════════════════════════
+// Station logos — embedded base64 (works offline, no external requests)
+const STATION_LOGOS = {
+  adnoc:  'data:image/png;base64,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',
+  enoc:   'data:image/png;base64,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',
+  eppco:  'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCABQAFADASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAAAAYHCAEEBQID/8QAPxAAAQMEAAQCBQgGCwAAAAAAAQIDBAAFBhEHEiExQWETFFGB0QgVFiIyVnGUQleRlbHSFxhGUlNUVWKTocH/xAAcAQACAwADAQAAAAAAAAAAAAADBQIEBgABBwj/xAAxEQABAwMCBAQEBgMAAAAAAAABAgMRAAQhEjEFE0FRBmFxgRQiMqEWQoOxwdHS4fD/2gAMAwEAAhEDEQA/AESiiis5X0hRRRR+NcrlFHt8u/lUz8OOE0FvGXc1z9bsa1MsGSiEklC1tgb5nD3APgkaJ2NkdqkvhziDD1sby65WWIy8povWi0NtJDMFsjaNp/TeUNFS1bI3oaq03arVE4rL33iu1ttWgatJidgT2B6x1OwHUmAatx7NeJMtMSPaZ70lSA4GURllZSeyuUDej7a6IwnMj/ZO+fkXPhVh+CGa4mzianLzfYUPIZEl127euvBp1bxWdb5tbSE6AHYAa6U+/TvCvvbY/wA+38aKi0bUmSqlV74sv2H1NJtp0mJznzGNu3lVO/oTmX3Uvn5Fz4VzbtaLtaHG2rtbJkBbiSpCZLKmyoDoSAR1FXNuvEbCIFtkzVZNanww2V+iYloW4vQ+ylIOyT2qoOdZNcMvyaVfLiohbytNNb2llsfZQPIf9kk+NCfZbbGDJppwHjN9xJxXNZCEDrmSewn7/wC64dFFFVa1NFNnB+yMZDxKslrlIDkdT5deQeykNpKyk+R5QPfSnTbwdvcfHuJdluktYbjJfLTyyeiEuJKOY+Q5gfdU241idpqlxLmfBu8r6tKo9YMVZL5R5eRwkuJZQpTQdjmQlP8AhB1PN/5T7aJcSda4syC4hcV9pK2VJ7FJAI17qzcYUS525+BNZRIiyWy262rqFpI0RUXR+E2Q2LnYw7iLdbVAKipER5kPpb37CSP4U6VqSvUBM14pbm2uLUMOuaFJUSCQSCFAA7AkEae3Wn66Yhil0lKlXHHLTLfUdqddiIUpR8yRs1qf0e4J90bH+Sb+FKAwTih+tl793I+NZ+gnFD9bL37tR8ajM/k/b+6sJaCRpTfAD9T/ABr58XInDzBsUcuBxCwOT3ttQWDCR9dzXc9PspHU/s8RVU1qK1qWdbUSToADr7AO34VKXH6w3SzS7ecjzZeQXRaCGmDGDfoWdnajo6G1dB02deVRZS26WSuIiK9M8L2qWbPmcwuFXXMY6DVBj2yaKKK2LbBm3Kc1Bt0R6XKeOm2WUFS1HyAqtWjUoJBJMCteinSVwrzyLAkTpNj9CxGaU88VymdtoA2SRz7HQU0YRwglzsSYyefFl3JUtn0kK2RFpaUoEHlU64sjlT2Ok7Ov2UVLDijEUrf43YMt8wugiYwQc9t4HvArxw745X/GoDNrusRN6gspCGlKd5H20jsnm0QoDw2N+dSFH+UZjCkAv2K8tq8Qn0Sh+3mFREODXEnQ3jhJ1/mmf56Tr7ablYrk9bbvCehS2dFbTg6gHqD06EH2ijB99sZ28xSdfBOA8SdKmykqOTpV94B/irJf1isR/wBIvf8Axtfz15d+UXigbUW7NelL5TygobAJ8ATz9KrtkmP3fHH47F6ieqOyI6ZDaCtKiWz2JAJ12PQ9elNWI8MLxc8gjW+9lVnivW1dzMghLiksDWlFIV02SB114+ypi5fJgVUd8NcBZa5y1fLk/VMxvEb+1KmVX24ZLf5d7ujvPKlL5lAfZQOyUJ/2gdBXMrLno/SK9Eoqb5jyKI0SnfQn3ViqRJJk1tW20toCECAMAUVJ3yfJFwtt/uFxYxu73WI7EVDdkW5nnciqUQQpO9Deh23vtSHjFiueSXuPZrRHL8uQdJTvQSB3Uo+CQO5qSUWjGMSK7NN4y3CDLaWTIj2ll1TLbnYjaToq6aPY9OtFZSQdfQf91pPxp5pbKrTdShsApRjvCQSPKcetMPzVjOB8PLpa8nuN4gv5PI+qA0hycIyNaLiRsJ5vrb7/AG9d90jer8JgNDKczAHYCIivlIwa+5XLlXbF5Mu/2xLwjIuNxkIZcfcCQSAlxW9ddCuRaMByy6XO5W2Pai3KtgSZiJDyGQzvtsqIHXW+h7daIsqJACMdKX2jNuhK1uXRCzlWUpjYCQQSIEDPWmKEjhEzLadeyTNHm0LClN+rpRzaPbY6j3Uz3+7cPMxyt7KXkZZefm9lC1wWICUststnY51dwneyST161FV3xHJLVfmbFNs8lNxkAFhlsBwvA9igp2FDoeoPhXauuC5/jFgm3CXFdgW9TaUzUtz29lJOkhxCV7I2exB710laxI049KI/aWilIWLo6lCEypOQSJiAN+4zPWpBu7GGZ7kkjMEwM6vzfOlHqsO2AM/USNNc3gPE9d/WPtpfvfFQSmcsdXbX411u7SLbGQCOSDEQCCknuVkqXsAAb/CudjWF8XBakKs0e8wIjm3G2vnARecnuQ2Vgknp4Uh3SDNttwfg3GM7GlsrKXmnRpSVef8AGu1uLAmImo2XDbN1wtl0OBEBICpKQCDBAxuBOMxBNa1FFFVa1NSd8nC/WeyZpLau8pEJNwhKisSlnlS0sqB0Vfo7139oFOd7j8QrDa5TjULh6u1wmVFEtLTey2kdFAKJJV5Hez7ar9WAAOwA91HQ/pRppDd8DS/dG4Ch80SCmRjtkRj1qeMrThtiwrEcWye6XJD0VAusuNAjpWqQ8sk6UvekEKKh8OldDIMgsNz4c3C85JNkWX6YTByIiMCQ8IrACUII7dQgkk/36rxRUviTnFA/DiDpKnTqCionHU6sDYfNBzq2AqwOCZdaL9eZtux8ptsi2Y8bfji7g6kOLWd8yirsFHTfQeAPmKUsBxR7G+Kljcz56Ewl91xxKXZzbylupTtCnNE6HORoqPUgVFRAPcA0aHXoOvfpXXPmCRkUZPAuVzEMuQlYg4lQwRIVPcycHM7TU4TcSySRxMXl+d3mFbLRFm+spkqnoVzNIXtttlKTsbAA7Dx7mo24o5G1lmeXS+sNqbjvuJSwFDSvRoSEpJHtIG/fSxobB0OnbyrNQW7qEAedWbLhht3A64oEhOkQNIA32k5MDr7UUUUUKm1f/9k=',
+  emarat: 'data:image/png;base64,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',
+};
+
+function stationLogo(name) {
+  const n = (name || '').toLowerCase();
+  let key = null;
+  if (n.includes('adnoc'))       key = 'adnoc';
+  else if (n.includes('eppco'))  key = 'eppco';
+  else if (n.includes('enoc'))   key = 'enoc';
+  else if (n.includes('emarat')) key = 'emarat';
+
+  if (key && STATION_LOGOS[key]) {
+    return `<div style="width:34px;height:34px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1px solid #e5e5ea;padding:3px">
+      <img src="${STATION_LOGOS[key]}" alt="${name}" style="width:100%;height:100%;object-fit:contain"/>
+    </div>`;
+  }
+  // Unknown station fallback
+  const initials = name ? name.substring(0, 3).toUpperCase() : '⛽';
+  return `<div style="width:34px;height:34px;border-radius:50%;background:#2c2c2e;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#c9a84c;border:1px solid #3a3a3c;flex-shrink:0">${initials}</div>`;
+}
+
+// ═══════════════════════════════════════
+//  STORAGE HELPERS
+// ═══════════════════════════════════════
+function ls(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
+function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+let settings=ls('settings',{...DEFAULTS});
+let fuelData=ls('fuel',null)||[...SEED_FUEL];
+let spendData=ls('spend',null)||[...SEED_SPEND];
+let carData=ls('car_cost',null)||[...SEED_CAR];
+let svcData=ls('service',null)||[...SEED_SVC];
+let issuesData=ls('issues',null)||[...SEED_ISSUES];
+let modsData=ls('mods',null)||[...SEED_MODS];
+let tripHistory=ls('trip_history',[]); function saveTripHistory(){ss('trip_history',tripHistory);}
+let cleanData=ls('cleaning',{sessions:Array(settings.cleanSess||15).fill(false).map((_,i)=>i===0)});
+
+function saveFuel(){ss('fuel',fuelData);}
+function saveSpend(){ss('spend',spendData);}
+function saveCar(){ss('car_cost',carData);}
+function saveSvc(){ss('service',svcData);}
+function saveIssues(){ss('issues',issuesData);}
+function saveMods(){ss('mods',modsData);}
+function saveClean(){ss('cleaning',cleanData);}
+function saveSettings2(){ss('settings',settings);}
+
+// ═══════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmt(n){return n>=1000?(n/1000).toFixed(1)+'k':Math.round(n).toString();}
+function fmtN(n){return n.toLocaleString('en-AE',{minimumFractionDigits:0,maximumFractionDigits:0});}
+function todayStr(){return new Date().toISOString().split('T')[0];}
+function getMK(d){const dt=new Date(d);return`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;}
+function getYK(d){return new Date(d).getFullYear().toString();}
+
+// ═══════════════════════════════════════
+//  THEME
+// ═══════════════════════════════════════
+function setTheme(t){
+  settings.theme=t;
+  document.documentElement.setAttribute('data-theme',t);
+  document.querySelectorAll('.theme-opt').forEach(el=>{
+    el.classList.toggle('active',el.textContent.toLowerCase()===t);
+  });
+}
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme',settings.theme||'dark');
+  document.querySelectorAll('.theme-opt').forEach(el=>{
+    el.classList.toggle('active',el.textContent.toLowerCase()===(settings.theme||'dark'));
+  });
+}
+
+// ═══════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════
+const PAGE_TITLES={dashboard:'Dashboard',fuel:'Fuel Log',budget:'Budget',cleaning:'Car Cleaning',maintenance:'Maintenance',checklist:'Checklist',loan:'Loan Calculator',trip:'Trip Calculator',settings:'Settings'};
+let currentPage='dashboard';
+let fuelFilter=null;
+let fuelYearFilter=null;
+
+function switchPage(p){
+  currentPage=p;
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('page-title').textContent=PAGE_TITLES[p]||p;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const ni=['dashboard','fuel','budget'].indexOf(p);
+  if(ni>=0)document.querySelectorAll('.nav-btn')[ni].classList.add('active');
+  document.getElementById('fab').classList.toggle('hidden',p!=='fuel'&&p!=='dashboard');
+  document.getElementById('content').scrollTop=0;
+  if(p==='fuel')renderFuel();
+  else if(p==='budget')renderBudget();
+  else if(p==='cleaning')renderCleaning();
+  else if(p==='maintenance')renderMaintenance();
+  else if(p==='checklist')renderRequirements();
+
+  else if(p==='settings')renderSettings();
+  else if(p==='loan'){calcLoan();renderRegCosts();}
+  else if(p==='trip')calcTrip();
+}
+function menuNav(p){
+  document.querySelectorAll('.mi').forEach(m=>m.classList.remove('active'));
+  const mi=document.getElementById('mi-'+p);if(mi)mi.classList.add('active');
+  closeMenu();switchPage(p);
+}
+
+// ═══════════════════════════════════════
+//  MENU
+// ═══════════════════════════════════════
+function toggleMenu(){document.getElementById('menu-overlay').classList.toggle('open');}
+function closeMenu(){document.getElementById('menu-overlay').classList.remove('open');}
+function handleMenuBg(e){if(e.target===document.getElementById('menu-backdrop'))closeMenu();}
+
+// ═══════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════
+function openFuelModal(){
+  document.getElementById('modal-title').textContent='Log Fill-up ⛽';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="field-row">
+      <div class="field"><label>Date</label><input type="date" id="f-date" value="${todayStr()}"/></div>
+      <div class="field"><label>Type</label><select id="f-type"><option>Super</option><option>Special</option><option>E-Plus</option></select></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Station</label><select id="f-sta"><option>Adnoc</option><option>Enoc</option><option>Eppco</option><option>Emarat</option><option>Other</option></select></div>
+      <div class="field"><label>Amount (AED)</label><input type="number" id="f-amt" placeholder="100" inputmode="decimal"/></div>
+    </div>
+    <div class="field"><label>Note (optional)</label><input type="text" id="f-note" placeholder="e.g. paid from points"/></div>
+    <button class="btn-p" onclick="saveFuelEntry()">Save Fill-up</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function editFuelEntry(i) {
+  const f = fuelData[i];
+  if (!f) return;
+  document.getElementById('modal-title').textContent = 'Edit Fill-up ⛽';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="field-row">
+      <div class="field"><label>Date</label><input type="date" id="f-date" value="${f.date}"/></div>
+      <div class="field"><label>Type</label>
+        <select id="f-type">
+          <option${f.type==='Super'?' selected':''}>Super</option>
+          <option${f.type==='Special'?' selected':''}>Special</option>
+          <option${f.type==='E-Plus'?' selected':''}>E-Plus</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Station</label>
+        <select id="f-sta">
+          <option${f.station==='Adnoc'?' selected':''}>Adnoc</option>
+          <option${f.station==='Enoc'?' selected':''}>Enoc</option>
+          <option${f.station==='Eppco'?' selected':''}>Eppco</option>
+          <option${f.station==='Emarat'?' selected':''}>Emarat</option>
+          <option${f.station==='Other'?' selected':''}>Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Amount (AED)</label><input type="number" id="f-amt" value="${f.amount}" inputmode="decimal"/></div>
+    </div>
+    <div class="field"><label>Note (optional)</label><input type="text" id="f-note" value="${f.note||''}"/></div>
+    <button class="btn-p" onclick="saveEditedFuelEntry(${i})">Save Changes</button>
+    <button class="btn-del" onclick="deleteFuelEntry(${i})">Delete Entry</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function saveEditedFuelEntry(i) {
+  const date   = document.getElementById('f-date').value;
+  const type   = document.getElementById('f-type').value;
+  const station= document.getElementById('f-sta').value;
+  const amount = parseFloat(document.getElementById('f-amt').value);
+  const note   = document.getElementById('f-note').value.trim();
+  if (!date || isNaN(amount) || amount <= 0) { showToast('Enter a valid amount'); return; }
+  fuelData[i] = {date, type, station, amount, ...(note?{note}:{})};
+  fuelData.sort((a,b)=>a.date.localeCompare(b.date));
+  saveFuel(); closeModal(); showToast('Updated ✓');
+  renderDashboard(); if(currentPage==='fuel') renderFuel();
+}
+
+function deleteFuelEntry(i) {
+  const removed = fuelData.splice(i, 1)[0];
+  saveFuel(); closeModal();
+  renderDashboard(); if(currentPage==='fuel') renderFuel();
+  showUndoToast('Deleted ' + removed.date + ' · AED ' + removed.amount, () => {
+    fuelData.splice(i, 0, removed);
+    fuelData.sort((a,b)=>a.date.localeCompare(b.date));
+    saveFuel(); renderDashboard(); if(currentPage==='fuel') renderFuel();
+  });
+}
+
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+function closeModalBg(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
+function saveFuelEntry(){
+  const date=document.getElementById('f-date').value;
+  const type=document.getElementById('f-type').value;
+  const station=document.getElementById('f-sta').value;
+  const amount=parseFloat(document.getElementById('f-amt').value);
+  const note=document.getElementById('f-note').value.trim();
+  if(!date||isNaN(amount)||amount<=0){showToast('Enter a valid amount');return;}
+  fuelData.push({date,type,station,amount,...(note?{note}:{})});
+  fuelData.sort((a,b)=>a.date.localeCompare(b.date));
+  saveFuel();closeModal();showToast('Fill-up saved ✓');
+  renderDashboard();if(currentPage==='fuel')renderFuel();
+}
+
+
+// ═══════════════════════════════════════
+//  UNDO DELETE
+// ═══════════════════════════════════════
+// We store undo on window so inline onclick always finds it.
+window._undoFn = null;
+window._undoTimer = null;
+
+function showUndoToast(msg, undoFn) {
+  if (window._undoTimer) clearTimeout(window._undoTimer);
+  window._undoFn = undoFn;
+  const t = document.getElementById('toast');
+  t.style.pointerEvents = 'auto';  // ← KEY FIX: let clicks through
+  t.innerHTML = '<span>' + msg + '</span>' +
+    '<button onclick="doUndo()" style="margin-left:14px;color:#c9a84c;font-weight:800;font-size:13px;background:none;border:none;cursor:pointer;text-decoration:underline;padding:4px 0">Undo</button>';
+  t.classList.add('show');
+  window._undoTimer = setTimeout(() => {
+    t.style.pointerEvents = 'none';
+    t.classList.remove('show');
+    window._undoFn = null;
+  }, 8000);
+}
+
+function doUndo() {
+  clearTimeout(window._undoTimer);
+  window._undoTimer = null;
+  const fn = window._undoFn;
+  window._undoFn = null;
+  const t = document.getElementById('toast');
+  t.style.pointerEvents = 'none';
+  t.classList.remove('show');
+  if (fn) {
+    fn();
+    setTimeout(() => showToast('Restored ✓'), 80);
+  }
+}
+
+// ═══════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════
+function showToast(msg){const t=document.getElementById('toast');t.innerHTML=`<span>${msg}</span>`;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+
+// swipe-to-delete removed — delete is now inside edit modals
+
+// ═══════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════
+function renderDashboard(){
+  const now=new Date();
+  const mk=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('date-badge').textContent=now.toLocaleDateString('en-AE',{day:'numeric',month:'short',year:'2-digit'});
+  // Gauge
+  const mf=fuelData.filter(f=>getMK(f.date)===mk);
+  const spent=mf.reduce((s,f)=>s+f.amount,0);
+  const bgt=settings.fuelBudget||1000;
+  const pct=Math.min(spent/bgt,1);
+  const fill=document.getElementById('gauge-fill');
+  fill.setAttribute('stroke-dashoffset',251.2);fill.classList.remove('danger','warn');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    fill.setAttribute('stroke-dashoffset',251.2-(pct*251.2));
+    if(pct>=1)fill.classList.add('danger');else if(pct>=.75)fill.classList.add('warn');
+  }));
+  document.getElementById('gauge-val').textContent=fmtN(spent);
+  const rem=Math.max(0,bgt-spent);
+  document.getElementById('gauge-meta').innerHTML=`
+    <div class="gm-item"><div class="gv">${mf.length}</div><div class="gl">Fill-ups</div></div>
+    <div class="gm-item"><div class="gv" style="color:${rem>0?'var(--gold)':'var(--red)'}">${rem>0?fmtN(rem):'Over!'}</div><div class="gl">Remaining</div></div>
+    <div class="gm-item"><div class="gv">${fmtN(bgt)}</div><div class="gl">Budget</div></div>`;
+  // Stats — sync Car Expenses from live data before summing
+  const sal=settings.salary||8700;
+  const _petrolAvg = calcPetrolAvg();
+  const _svcAvgMo  = calcSvcAvgPerYear() / 12;
+  const _carTotal  = carData.reduce((sum,item)=>{
+    const isPetrol=item.name.toLowerCase().includes('petrol');
+    return sum+(isPetrol?_petrolAvg:item.monthly);
+  },0)+_svcAvgMo;
+  const _carExpIdx = spendData.findIndex(i=>i.name.toLowerCase().includes('car expense')||i.name.toLowerCase().includes('car exp'));
+  if(_carExpIdx!==-1 && spendData[_carExpIdx].monthly !== Math.round(_carTotal)) {
+    spendData[_carExpIdx].monthly=Math.round(_carTotal);
+    saveSpend();
+  }
+  const totalS=spendData.reduce((a,i)=>a+i.monthly,0);
+  const act=sal-totalS;
+  const tgt=sal*(settings.savePct||20)/100;
+  const sc=document.getElementById('d-scard');
+  sc.className='stat '+(act>=tgt?'gr':act>0?'am':'rd');
+  document.getElementById('d-salary').textContent=fmtN(sal);
+  document.getElementById('d-spent').textContent=fmtN(totalS);
+  document.getElementById('d-saving').textContent=fmtN(act);
+  // Ring — guard against zero salary / zero target / NaN
+  const safeTgt = tgt > 0 ? tgt : 1;
+  const safeSal = sal > 0 ? sal : 1;
+  const rp = isFinite(act/safeTgt) ? Math.max(0, Math.min(act/safeTgt, 1)) : 0;
+  const ring = document.getElementById('saving-ring');
+  ring.setAttribute('stroke-dashoffset', 188.5);
+  ring.classList.toggle('danger', act < 0);
+  // rAF inside rAF guarantees the browser has painted before we animate
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const offset = 188.5 - (rp * 188.5);
+    ring.setAttribute('stroke-dashoffset', isNaN(offset) ? 188.5 : offset);
+  }));
+  const pctDisplay = Math.round((act / safeSal) * 100);
+  document.getElementById('saving-pct').textContent = (pctDisplay > 0 ? pctDisplay : 0) + '%';
+  const gap = tgt - act;
+  document.getElementById('saving-gap').textContent = gap > 0
+    ? `AED ${fmtN(gap)} below target`
+    : '✓ Target met!';
+  // Chart
+  const bkts={};fuelData.forEach(f=>{const k=getMK(f.date);bkts[k]=(bkts[k]||0)+f.amount;});
+  const mos=Object.keys(bkts).sort().slice(-6);
+  const maxA=Math.max(...mos.map(k=>bkts[k]));
+  document.getElementById('mini-chart').innerHTML=mos.map(k=>{
+    const [yr,mo]=k.split('-');const a=bkts[k];const h=Math.max(3,(a/maxA)*70);
+    return`<div class="bc${k===mk?' cur':''}"><div class="al">${fmt(a)}</div><div class="b" style="height:${h}px"></div><div class="ml">${MONTHS[parseInt(mo)-1]}</div></div>`;
+  }).join('');
+  // Recent
+  document.getElementById('recent-fills').innerHTML=[...fuelData].reverse().slice(0,5).map(renderFuelItem).join('')||'<div class="empty"><div class="empty-icon">⛽</div>No fill-ups yet</div>';
+}
+
+// ═══════════════════════════════════════
+//  FUEL PAGE
+// ═══════════════════════════════════════
+function pillStyle(active){
+  return `flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid ${active?'var(--gold)':'var(--border)'};color:${active?'var(--gold)':'var(--text-dim)'};background:${active?'var(--gold-glow)':'var(--surface2)'};white-space:nowrap;cursor:pointer`;
+}
+function renderFuel(){
+  // Determine active year for stats
+  const activeYr = fuelYearFilter || new Date().getFullYear().toString();
+  const yd = fuelData.filter(f => getYK(f.date) === activeYr);
+  const yt = yd.reduce((s,f)=>s+f.amount,0);
+  const bm = {}; yd.forEach(f=>{const k=getMK(f.date);bm[k]=(bm[k]||0)+f.amount;});
+  const mc = Object.keys(bm).length||1;
+  document.getElementById('f-yr').textContent = 'AED '+fmtN(yt);
+  document.getElementById('f-avg').textContent = 'AED '+fmtN(yt/mc);
+  document.getElementById('f-cnt').textContent = yd.length;
+
+  // Year pills
+  const allYears = [...new Set(fuelData.map(f=>getYK(f.date)))].sort().reverse();
+  document.getElementById('year-pills').innerHTML =
+    `<div onclick="setFY(null)" style="${pillStyle(fuelYearFilter===null)}">All Years</div>` +
+    allYears.map(y=>`<div onclick="setFY('${y}')" style="${pillStyle(fuelYearFilter===y)}">${y}</div>`).join('');
+
+  // Month pills — scoped to active year if set
+  const srcData = fuelYearFilter ? fuelData.filter(f=>getYK(f.date)===fuelYearFilter) : fuelData;
+  const ams = [...new Set(srcData.map(f=>getMK(f.date)))].sort().reverse();
+  document.getElementById('month-pills').innerHTML =
+    `<div onclick="setFF(null)" style="${pillStyle(fuelFilter===null)}">All</div>` +
+    ams.map(k=>{const[yr2,mo]=k.split('-');
+      return`<div onclick="setFF('${k}')" style="${pillStyle(fuelFilter===k)}">${MONTHS[parseInt(mo)-1]} ${yr2}</div>`;
+    }).join('');
+
+  renderFuelList();
+}
+function setFF(k){fuelFilter=k;renderFuel();}
+function setFY(y){fuelYearFilter=y;fuelFilter=null;renderFuel();}
+function renderFuelList(){
+  let d=[...fuelData].reverse();
+  if(fuelYearFilter) d=d.filter(f=>getYK(f.date)===fuelYearFilter);
+  if(fuelFilter) d=d.filter(f=>getMK(f.date)===fuelFilter);
+  document.getElementById('fuel-log-list').innerHTML=d.length?d.map((f,i)=>renderFuelItem(f,fuelData.indexOf(f))).join(''):'<div class="empty"><div class="empty-icon">⛽</div>No entries</div>';
+}
+function renderFuelItem(f, idx){
+  const ds=new Date(f.date).toLocaleDateString('en-AE',{day:'numeric',month:'short'});
+  const editBtn = (idx !== undefined)
+    ? `<button class="edit-btn" onclick="event.stopPropagation();editFuelEntry(${idx})" title="Edit"><svg class="pen-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`
+    : '';
+  return`<div class="log-item">
+    <div class="log-item-inner">
+      <div class="log-icon" style="background:none;border:none;width:34px;height:34px;flex-shrink:0">${stationLogo(f.station)}</div>
+      <div class="log-info">
+        <div class="log-top"><span class="log-st">${f.station}</span><span class="log-amt">AED ${f.amount.toFixed(2)}</span>${editBtn}</div>
+        <div class="log-tags">
+          <span class="tag">${ds}</span><span class="tag">${f.type}</span>
+          ${f.note?`<span class="tag amber">${f.note}</span>`:''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+
+// ─── Shared calc: avg annual service cost ───────────────
+function calcSvcAvgPerYear() {
+  if (!svcData.length) return 0;
+  const byYear = {};
+  svcData.forEach(s => {
+    const y = getYK(s.date);
+    byYear[y] = (byYear[y] || 0) + s.cost;
+  });
+  const vals = Object.values(byYear);
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
+}
+
+// ─── Shared calc: petrol 3-month avg ────────────────────
+function calcPetrolAvg() {
+  const now3 = new Date();
+  const months3 = [];
+  for (let m = 0; m < 3; m++) {
+    const d = new Date(now3.getFullYear(), now3.getMonth() - m, 1);
+    months3.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  const recent = fuelData.filter(f => months3.includes(getMK(f.date)));
+  const byMo = {};
+  recent.forEach(f => { const k = getMK(f.date); byMo[k] = (byMo[k] || 0) + f.amount; });
+  const moVals = Object.values(byMo);
+  return moVals.length ? moVals.reduce((a, b) => a + b, 0) / moVals.length : 0;
+}
+
+// ═══════════════════════════════════════
+//  BUDGET PAGE
+// ═══════════════════════════════════════
+function renderBudget(){
+  const sal      = settings.salary || 8700;
+  const petrolAvg = calcPetrolAvg();
+  const svcAvgMo  = calcSvcAvgPerYear() / 12;   // annual avg → monthly
+
+  // Compute live carTotal (petrol from fuel tracker, svc from maintenance)
+  const carTotal = carData.reduce((sum, item) => {
+    const isPetrol = item.name.toLowerCase().includes('petrol');
+    return sum + (isPetrol ? petrolAvg : item.monthly);
+  }, 0) + svcAvgMo;
+
+  // Sync the "Car Expenses" row in spendData to live carTotal and persist
+  const carExpIdx = spendData.findIndex(i => i.name.toLowerCase().includes('car expense') || i.name.toLowerCase().includes('car exp'));
+  if (carExpIdx !== -1 && spendData[carExpIdx].monthly !== Math.round(carTotal)) {
+    spendData[carExpIdx].monthly = Math.round(carTotal);
+    saveSpend(); // persist so dashboard always reads the correct value
+  }
+
+  const tot = spendData.reduce((a, i) => a + i.monthly, 0);
+  const act = sal - tot;
+  const tgt = sal * (settings.savePct || 20) / 100;
+
+  // ── Snapshot ──
+  document.getElementById('bgt-snap').innerHTML=`
+    <div class="li-row"><span class="li-name">Monthly Salary</span><span class="li-val" style="color:var(--gold)">AED ${fmtN(sal)}</span></div>
+    <div class="li-row"><span class="li-name">Total Spending</span><span class="li-val" style="color:${tot>sal?'var(--red)':''}">AED ${fmtN(tot)}</span></div>
+    <div class="li-row"><span class="li-name">Savings Target (${settings.savePct||20}%)</span><span class="li-val">AED ${fmtN(tgt)}</span></div>
+    <div class="li-row"><span class="li-name" style="font-weight:700">Actual Saving</span>
+      <span class="li-val" style="font-weight:700;color:${act>=tgt?'var(--green)':act>0?'var(--amber)':'var(--red)'}">AED ${fmtN(act)}</span></div>`;
+
+  // ── Spending breakdown — sorted high→low, Car Expenses locked ──
+  document.getElementById('bgt-break').innerHTML=[...spendData]
+    .sort((a,b)=>b.monthly-a.monthly)
+    .map((item)=>{
+      const i = spendData.indexOf(item);
+      const isCarExp = item.name.toLowerCase().includes('car expense') || item.name.toLowerCase().includes('car exp');
+      const p = (item.monthly / sal * 100);
+      const c = p > 40 ? 'rd' : p > 20 ? 'am' : 'ac';
+      const lockBadge = isCarExp
+        ? `<span style="font-size:10px;color:var(--text-mute);margin-left:5px;background:var(--surface3);padding:1px 6px;border-radius:10px">auto</span>`
+        : '';
+      const editBtn = isCarExp
+        ? '' // locked — no edit
+        : `<button class="edit-btn" onclick="editSpendItem(${i})" style="margin-left:4px"><svg class="pen-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`;
+      return`<div class="pb-wrap">
+        <div class="pb-hd">
+          <span class="pb-lbl">${item.name}${lockBadge}</span>
+          <span class="pb-val">AED ${fmtN(item.monthly)} (${p.toFixed(0)}%)${editBtn}</span>
+        </div>
+        <div class="pb-track"><div class="pb-fill ${c}" style="width:${Math.min(p,100)}%"></div></div>
+      </div>`;
+    }).join('');
+
+  // ── Car Cost Detail ──
+  document.getElementById('car-break').innerHTML = carData.map((item,i)=>{
+    const isSalik  = item.name.toLowerCase().includes('salik');
+    const isPetrol = item.name.toLowerCase().includes('petrol');
+    const displayVal = isPetrol ? petrolAvg : item.monthly;
+    const badge = isPetrol
+      ? `<span style="font-size:10px;color:var(--text-mute);margin-left:4px">(fuel avg)</span>`
+      : (!isSalik ? `<span style="font-size:10px;color:var(--text-mute);margin-left:4px">auto</span>` : '');
+    const editBtn = isSalik
+      ? `<button class="edit-btn" onclick="editSalik(${i})" style="margin-left:6px"><svg class="pen-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`
+      : '';
+    return`<div class="li-row">
+      <span class="li-name">${item.name}${badge}</span>
+      <span class="li-val" style="${isSalik?'':'color:var(--text-dim)'}">AED ${fmtN(displayVal)}/mo${editBtn}</span>
+    </div>`;
+  }).join('') +
+  // 2. Maintenance/service avg row
+  `<div class="li-row">
+    <span class="li-name">Maintenance <span style="font-size:10px;color:var(--text-mute)">(yr avg)</span></span>
+    <span class="li-val" style="color:var(--text-dim)">AED ${fmtN(svcAvgMo)}/mo</span>
+  </div>` +
+  // Total
+  `<div class="li-row" style="margin-top:4px">
+    <span class="li-name" style="font-weight:700">Total Car</span>
+    <span class="li-val" style="font-weight:700;color:var(--amber)">AED ${fmtN(carTotal)}/mo</span>
+  </div>`;
+
+  // Always keep dashboard in sync when budget changes
+  renderDashboard();
+}
+function addBudgetItem(){
+  const n=document.getElementById('bgt-new-name').value.trim();
+  const m=parseFloat(document.getElementById('bgt-new-amt').value);
+  if(!n||isNaN(m)||m<=0){showToast('Fill in name and amount');return;}
+  spendData.push({name:n,monthly:m});saveSpend();
+  document.getElementById('bgt-new-name').value='';document.getElementById('bgt-new-amt').value='';
+  renderBudget();showToast('Added ✓');
+}
+function removeBudgetItem(i){const removed=spendData.splice(i,1)[0];saveSpend();renderBudget();showUndoToast('Removed '+removed.name,()=>{spendData.splice(i,0,removed);saveSpend();renderBudget();});}
+function removeCarItem(i){const removed=carData.splice(i,1)[0];saveCar();renderBudget();showUndoToast('Removed '+removed.name,()=>{carData.splice(i,0,removed);saveCar();renderBudget();});}
+
+// ═══════════════════════════════════════
+//  CLEANING PAGE
+// ═══════════════════════════════════════
+function renderCleaning(){
+  // Populate settings fields
+  const cs = document.getElementById('s-clean-start');
+  const css = document.getElementById('s-clean-sess');
+  const csp = document.getElementById('s-clean-price');
+  if(cs) cs.value = settings.cleanStart||'2026-06-19';
+  if(css) css.value = settings.cleanSess||15;
+  if(csp) csp.value = settings.cleanPrice||94.5;
+  const done=cleanData.sessions.filter(Boolean).length;
+  const total=cleanData.sessions.length;
+  const pp=settings.cleanPrice||94.5;
+  const perSess=pp/total;
+  document.getElementById('cl-done').textContent=done;
+  // Update sessions label to show last clean date
+  const lastDone=[...cleanData.sessions].reverse().find(v=>typeof v==='string');
+  document.getElementById('cl-total').textContent=total;
+  document.getElementById('cl-cost').textContent='AED '+(done*perSess).toFixed(2);
+  document.getElementById('cl-price-disp').textContent='AED '+perSess.toFixed(2);
+  document.getElementById('cl-sub-disp').textContent='AED '+pp.toFixed(2);
+  document.getElementById('cl-sess-disp').textContent=total;
+  const sd=settings.cleanStart||'2026-06-19';
+  document.getElementById('cl-start-disp').textContent=new Date(sd).toLocaleDateString('en-AE',{day:'numeric',month:'short',year:'numeric'});
+  const start=new Date(sd);
+  document.getElementById('clean-grid').innerHTML=cleanData.sessions.map((val,i)=>{
+    const isDone = !!val;
+    const dateStr = typeof val === 'string'
+      ? new Date(val).toLocaleDateString('en-AE',{day:'numeric',month:'short'})
+      : '';
+    return`<div class="cl-cell${isDone?' done':''}" onclick="toggleClean(${i})">
+      <span class="cn">#${i+1}</span>
+      <span style="font-size:14px">${isDone?'✓':'–'}</span>
+      <span style="font-size:8px;color:${isDone?'var(--green)':'var(--text-mute)'}">${isDone?dateStr:'tap'}</span>
+    </div>`;
+  }).join('');
+}
+function toggleClean(i){
+  const cur = cleanData.sessions[i];
+  if (cur) {
+    // Already done → uncheck
+    cleanData.sessions[i] = false;
+    saveClean(); renderCleaning(); showToast('Unmarked');
+  } else {
+    // Not done → ask for date
+    openCleanDatePicker(i);
+  }
+}
+
+function openCleanDatePicker(i) {
+  document.getElementById('modal-title').textContent = `Session #${i+1} — Date Done`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="field"><label>Date</label>
+      <input type="date" id="clean-date-pick" value="${todayStr()}" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px 14px;font-size:15px;color:var(--text);outline:none;-webkit-appearance:none"/>
+    </div>
+    <button class="btn-p" onclick="confirmCleanDate(${i})">Mark Done</button>
+    <button class="btn-sec" onclick="closeModal()">Cancel</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function confirmCleanDate(i) {
+  const d = document.getElementById('clean-date-pick').value;
+  cleanData.sessions[i] = d || todayStr();
+  saveClean(); closeModal(); renderCleaning();
+  showToast('Session #'+(i+1)+' marked done ✓');
+}
+
+function resetCleanSessions() {
+  if (!confirm('Reset all sessions to unchecked? This cannot be undone.')) return;
+  cleanData.sessions = Array(cleanData.sessions.length).fill(false);
+  saveClean(); renderCleaning(); showToast('Sessions reset');
+}
+
+// ═══════════════════════════════════════
+//  MAINTENANCE PAGE
+// ═══════════════════════════════════════
+function renderMaintenance(){
+  const km = settings.currentKM || 101000;
+  const nextOil = Math.ceil(km/10000)*10000;
+  // populate KM input at top of page
+  const kmInput = document.getElementById('s-km');
+  if(kmInput && !kmInput.value) kmInput.value = km;
+
+  // Populate year filter dropdown
+  const svcYrSel = document.getElementById('svc-yr-filter');
+  const allSvcYrs = [...new Set(svcData.map(s=>getYK(s.date)))].sort().reverse();
+  const curSvcYr = svcYrSel ? svcYrSel.value : '';
+  if (svcYrSel) {
+    svcYrSel.innerHTML = '<option value="">All Years</option>' +
+      allSvcYrs.map(y=>`<option value="${y}"${curSvcYr===y?' selected':''}>${y}</option>`).join('');
+  }
+
+  // Filter service data by year
+  const filteredSvc = curSvcYr ? svcData.filter(s=>getYK(s.date)===curSvcYr) : svcData;
+  const totalCost = filteredSvc.reduce((s,v)=>s+v.cost, 0);
+
+  // Avg annual service cost
+  const svcByYear = {};
+  svcData.forEach(s => { const y=getYK(s.date); svcByYear[y]=(svcByYear[y]||0)+s.cost; });
+  const svcYearVals = Object.values(svcByYear);
+  const svcAvgYr = svcYearVals.length ? svcYearVals.reduce((a,b)=>a+b,0)/svcYearVals.length : 0;
+
+  document.getElementById('m-km').textContent = 'AED '+fmtN(svcAvgYr);
+  document.getElementById('m-next').textContent = fmtN(nextOil)+' km';
+  document.getElementById('m-total').textContent = 'AED '+fmtN(totalCost)+(curSvcYr?' ('+curSvcYr+')':'');
+
+  // Service intervals (always full list)
+  document.getElementById('svc-intervals').innerHTML=SVC_INTERVALS.map(iv=>{
+    const done=iv.next<=km;const due=iv.next<=km+5000&&iv.next>km;
+    const cls=done?'done':due?'due':'future';
+    const bc=done?'b-done':due?'b-due':'b-future';
+    const lbl=done?'Done':due?'Due soon':`At ${fmtN(iv.next)} km`;
+    return`<div class="iv-item"><div class="iv-dot ${cls}"></div>
+      <div class="iv-info"><div class="iv-task">${iv.task}</div><div class="iv-sub">Every ${iv.every}</div></div>
+      <span class="iv-badge ${bc}">${lbl}</span></div>`;
+  }).join('');
+
+  // Service history (filtered)
+  document.getElementById('svc-history').innerHTML=[...filteredSvc].reverse().map(s=>{
+    const i=svcData.indexOf(s);
+    const d=new Date(s.date).toLocaleDateString('en-AE',{day:'numeric',month:'short',year:'numeric'});
+    return`<div class="svc-item">
+        <div class="svc-hd"><span class="svc-name">${s.name}</span><span class="svc-cost">AED ${fmtN(s.cost)}<button class="edit-btn" onclick="editSvcItem(${i})" style="margin-left:6px"><svg class="pen-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button></span></div>
+        <div class="svc-meta">
+          <span class="svc-tag">${fmtN(s.km)} km</span><span class="svc-tag">${d}</span>
+          ${s.from?`<span class="svc-tag">${s.from}</span>`:''}
+        </div>
+    </div>`;
+  }).join('') || '<div class="empty" style="padding:20px"><div class="empty-icon">🔧</div>No records for this year</div>';
+}
+function addService(){
+  const name=document.getElementById('svc-name').value.trim();
+  const km=parseFloat(document.getElementById('svc-km').value);
+  const cost=parseFloat(document.getElementById('svc-cost').value);
+  const from=document.getElementById('svc-from').value.trim();
+  if(!name||isNaN(cost)){showToast('Fill name and cost');return;}
+  svcData.push({name,km:km||settings.currentKM||0,date:todayStr(),cost,from});
+  saveSvc();['svc-name','svc-km','svc-cost','svc-from'].forEach(id=>{document.getElementById(id).value='';});
+  renderMaintenance();showToast('Service added ✓');
+}
+function removeSvc(i){const removed=svcData.splice(i,1)[0];saveSvc();renderMaintenance();showUndoToast('Removed '+removed.name,()=>{svcData.splice(i,0,removed);saveSvc();renderMaintenance();});}
+
+// ═══════════════════════════════════════
+//  REQUIREMENTS PAGE
+// ═══════════════════════════════════════
+function renderRequirements(){
+  // Sort: active first by priority (P1→P4→none), then done by priority
+  function sortReqList(data) {
+    const priVal = p => p ? p : 99;
+    return [...data.keys()]
+      .map(i => ({i, r: data[i]}))
+      .sort((a, b) => {
+        if (a.r.done !== b.r.done) return a.r.done ? 1 : -1; // done sinks
+        return priVal(a.r.prio) - priVal(b.r.prio);          // then by priority
+      });
+  }
+
+  const PEN_SVG = `<svg class="pen-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+
+  ['req-issues','req-mods'].forEach(id=>document.getElementById(id).innerHTML='');
+
+  // Progress bars
+  const issTotal=issuesData.length, issDone=issuesData.filter(r=>r.done).length;
+  const modTotal=modsData.length,   modDone=modsData.filter(r=>r.done).length;
+  const issBar=document.getElementById('iss-progress-bar');
+  const modBar=document.getElementById('mod-progress-bar');
+  const issPct=document.getElementById('iss-progress');
+  const modPct=document.getElementById('mod-progress');
+  requestAnimationFrame(()=>{
+    if(issBar) issBar.style.width=(issTotal?issDone/issTotal*100:0)+'%';
+    if(modBar) modBar.style.width=(modTotal?modDone/modTotal*100:0)+'%';
+  });
+  if(issPct) issPct.textContent=`${issDone} / ${issTotal} done`;
+  if(modPct) modPct.textContent=`${modDone} / ${modTotal} done`;
+
+  sortReqList(issuesData).forEach(({i, r})=>{
+    const pc=r.prio?`p${r.prio}`:'p4'; const pl=r.prio?`P${r.prio}`:'–';
+    const el=document.createElement('div');
+    el.style.borderBottom='1px solid var(--border)';
+    el.id=`iss-sw-${i}`;
+    el.innerHTML=`<div class="req-item" id="iss-si-${i}" style="${r.done?'opacity:0.5':''}">
+        <div class="req-ck${r.done?' done':''}" onclick="toggleReq('issues',${i})"></div>
+        <span class="req-lbl${r.done?' done':''}">${r.label}</span>
+        <button class="edit-btn" onclick="editReqItem('issues',${i})">${PEN_SVG}</button>
+        <span class="prio ${pc}">${pl}</span>
+      </div>`;
+    document.getElementById('req-issues').appendChild(el);
+  });
+
+  sortReqList(modsData).forEach(({i, r})=>{
+    const pc=r.prio?`p${r.prio}`:'p4'; const pl=r.prio?`P${r.prio}`:'–';
+    const el=document.createElement('div');
+    el.style.borderBottom='1px solid var(--border)';
+    el.id=`mod-sw-${i}`;
+    el.innerHTML=`<div class="req-item" id="mod-si-${i}" style="${r.done?'opacity:0.5':''}">
+        <div class="req-ck${r.done?' done':''}" onclick="toggleReq('mods',${i})"></div>
+        <span class="req-lbl${r.done?' done':''}">${r.label}${r.price?` <span class="req-price">AED ${fmtN(r.price)}</span>`:''}</span>
+        <button class="edit-btn" onclick="editReqItem('mods',${i})">${PEN_SVG}</button>
+        <span class="prio ${pc}">${pl}</span>
+      </div>`;
+    document.getElementById('req-mods').appendChild(el);
+  });
+}
+function toggleReq(list,i){
+  if(list==='issues')issuesData[i].done=!issuesData[i].done,saveIssues();
+  else modsData[i].done=!modsData[i].done,saveMods();
+  renderRequirements();
+}
+function addReq(list){
+  if(list==='issues'){
+    const lbl=document.getElementById('iss-new').value.trim();
+    const prio=parseInt(document.getElementById('iss-prio').value);
+    if(!lbl){showToast('Enter a description');return;}
+    issuesData.push({done:false,label:lbl,prio});saveIssues();
+    document.getElementById('iss-new').value='';
+  } else {
+    const lbl=document.getElementById('mod-new').value.trim();
+    const price=parseFloat(document.getElementById('mod-price').value)||null;
+    const prio=parseInt(document.getElementById('mod-prio').value);
+    if(!lbl){showToast('Enter a description');return;}
+    modsData.push({done:false,label:lbl,prio,price});saveMods();
+    document.getElementById('mod-new').value='';document.getElementById('mod-price').value='';
+  }
+  renderRequirements();showToast('Added ✓');
+}
+function removeReq(list,i){
+  if(list==='issues'){const removed=issuesData.splice(i,1)[0];saveIssues();renderRequirements();showUndoToast('Removed: '+removed.label,()=>{issuesData.splice(i,0,removed);saveIssues();renderRequirements();});}
+  else{const removed=modsData.splice(i,1)[0];saveMods();renderRequirements();showUndoToast('Removed: '+removed.label,()=>{modsData.splice(i,0,removed);saveMods();renderRequirements();});}
+}
+
+// ═══════════════════════════════════════
+//  LOAN CALCULATOR
+// ═══════════════════════════════════════
+function calcLoan(){
+  const price   = parseFloat(document.getElementById('lc-price').value)  || 0;
+  const dpPct   = parseFloat(document.getElementById('lc-dp').value)     || 0;
+  const years   = parseFloat(document.getElementById('lc-years').value)  || 5;
+  const rateAnn = parseFloat(document.getElementById('lc-rate').value)   || 3.8427;
+
+  // ── Tariq's flat-rate formula ──────────────────────────────
+  const dp              = price * (dpPct / 100);
+  const financed        = price - dp;
+  const months          = years * 12;
+  const totalInterest   = financed * (rateAnn / 100) * years;   // flat annual interest
+  const totalToFinance  = financed + totalInterest;              // principal + all interest
+  const ppm             = totalToFinance / months;               // equal monthly payment
+  // ──────────────────────────────────────────────────────────
+
+  if (!price) { document.getElementById('loan-result').innerHTML=''; return; }
+
+  document.getElementById('loan-result').innerHTML=`
+    <div class="lr-row"><span>Car Price</span><span>AED ${fmtN(price)}</span></div>
+    <div class="lr-row"><span>Down Payment (${dpPct}%)</span><span>AED ${fmtN(dp)}</span></div>
+    <div class="lr-row"><span>Amount After Down Payment</span><span>AED ${fmtN(financed)}</span></div>
+    <div class="lr-row"><span>Loan Term</span><span>${years} yrs (${months} months)</span></div>
+    <div class="lr-row"><span>Total Bank Interest (${rateAnn}% × ${years}yr)</span><span>AED ${fmtN(totalInterest)}</span></div>
+    <div class="lr-row"><span>Total to Finance</span><span>AED ${fmtN(totalToFinance)}</span></div>
+    <div class="lr-row"><span>Monthly Payment (PPM)</span><span>AED ${ppm.toFixed(2)}</span></div>`;
+}
+
+// ═══════════════════════════════════════
+//  PC PAGE
+// ═══════════════════════════════════════
+function renderPC(){
+  document.getElementById('pc-specs').innerHTML=PC_SPECS.map(p=>
+    `<div class="pc-item"><div class="pc-cat">${p.cat}</div><div class="pc-name">${p.name}</div></div>`).join('');
+}
+
+// ═══════════════════════════════════════
+//  SETTINGS PAGE
+// ═══════════════════════════════════════
+function renderSettings(){
+  document.getElementById('s-salary').value=settings.salary||8700;
+  document.getElementById('s-save-pct').value=settings.savePct||20;
+  document.getElementById('s-fuel-bgt').value=settings.fuelBudget||1000;
+  applyTheme();
+}
+function saveSettings(){
+  settings.salary     = parseFloat(document.getElementById('s-salary').value)||8700;
+  settings.savePct    = parseFloat(document.getElementById('s-save-pct').value)||20;
+  settings.fuelBudget = parseFloat(document.getElementById('s-fuel-bgt').value)||1000;
+  saveSettings2();
+  showToast('Settings saved ✓');
+  renderDashboard();
+}
+
+
+// ═══════════════════════════════════════
+//  EDIT FUNCTIONS
+// ═══════════════════════════════════════
+function openEditModal(title, fields, onSave, onDelete) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = fields.map((f,i) =>
+    `<div class="edit-modal-row">
+      <span class="edit-modal-lbl">${f.label}</span>
+      <input class="edit-modal-val" id="ef-${i}" type="${f.type||'text'}" value="${f.value||''}" ${f.step?'step="'+f.step+'"':''}/>
+    </div>`
+  ).join('') +
+  `<button class="btn-p" style="margin-top:16px" onclick="submitEdit(${fields.length})">Save Changes</button>` +
+  (onDelete ? `<button class="btn-del" onclick="submitDelete()">Delete</button>` : '');
+  window._editCallback = onSave;
+  window._editFields   = fields;
+  window._deleteCallback = onDelete || null;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function submitEdit() {
+  const vals = {};
+  window._editFields.forEach((f,i) => {
+    const el = document.getElementById('ef-'+i);
+    vals[f.key] = f.type==='number' ? parseFloat(el.value) : el.value;
+  });
+  window._editCallback(vals);
+  closeModal();
+  showToast('Updated ✓');
+}
+
+function submitDelete() {
+  if (!window._deleteCallback) return;
+  const fn = window._deleteCallback;
+  window._deleteCallback = null;
+  closeModal();
+  fn(); // runs the undo-aware delete
+}
+
+
+function editSalik(i) {
+  const item = carData[i];
+  // No delete — Salik is a fixed budget item, just edit the amount
+  openEditModal('Edit Salik / Tolls', [
+    {label:'Monthly Salik (AED)', key:'monthly', type:'number', value:item.monthly},
+  ],
+  vals => { carData[i] = {...item, ...vals}; saveCar(); renderBudget(); }
+  // no onDelete arg
+  );
+}
+
+function editSpendItem(i) {
+  const item = spendData[i];
+  openEditModal('Edit Spending Item', [
+    {label:'Category', key:'name', type:'text', value:item.name},
+    {label:'Amount/mo', key:'monthly', type:'number', value:item.monthly},
+  ],
+  vals => { spendData[i] = {...item, ...vals}; saveSpend(); renderBudget(); },
+  () => { const r=spendData.splice(i,1)[0]; saveSpend(); renderBudget(); showUndoToast('Removed '+r.name, ()=>{spendData.splice(i,0,r);saveSpend();renderBudget();}); }
+  );
+}
+
+function editSvcItem(i) {
+  const item = svcData[i];
+  openEditModal('Edit Service Record', [
+    {label:'Service', key:'name', type:'text', value:item.name},
+    {label:'KM', key:'km', type:'number', value:item.km},
+    {label:'Cost (AED)', key:'cost', type:'number', value:item.cost},
+    {label:'From', key:'from', type:'text', value:item.from||''},
+  ],
+  vals => { svcData[i] = {...item, ...vals}; saveSvc(); renderMaintenance(); },
+  () => { const r=svcData.splice(i,1)[0]; saveSvc(); renderMaintenance(); showUndoToast('Removed '+r.name, ()=>{svcData.splice(i,0,r);saveSvc();renderMaintenance();}); }
+  );
+}
+
+function editReqItem(list, i) {
+  const item = list==='issues' ? issuesData[i] : modsData[i];
+  const fields = [{label:'Label', key:'label', type:'text', value:item.label},
+    {label:'Priority', key:'prio', type:'number', value:item.prio||''}];
+  if(list==='mods') fields.push({label:'Price (AED)', key:'price', type:'number', value:item.price||''});
+  openEditModal('Edit Item', fields,
+  vals => {
+    if(list==='issues'){issuesData[i]={...item,...vals};saveIssues();}
+    else{modsData[i]={...item,...vals};saveMods();}
+    renderRequirements();
+  },
+  () => {
+    if(list==='issues'){const r=issuesData.splice(i,1)[0];saveIssues();renderRequirements();showUndoToast('Removed: '+r.label,()=>{issuesData.splice(i,0,r);saveIssues();renderRequirements();});}
+    else{const r=modsData.splice(i,1)[0];saveMods();renderRequirements();showUndoToast('Removed: '+r.label,()=>{modsData.splice(i,0,r);saveMods();renderRequirements();});}
+  });
+}
+
+function editCleanCell(i) {
+  const startDate = new Date(settings.cleanStart||'2026-06-19');
+  const d = new Date(startDate); d.setDate(d.getDate() + i*2);
+  openEditModal('Edit Session #'+(i+1), [
+    {label:'Date', key:'date', type:'date', value:d.toISOString().split('T')[0]},
+  ], vals => { showToast('Date noted (display only)'); });
+}
+
+
+
+// ═══════════════════════════════════════
+//  REGISTRATION COSTS
+// ═══════════════════════════════════════
+const REG_DEFAULTS = {
+  renewal: [
+    {name:'Insurance (TPL)', val:680},
+    {name:'Renewal Test',    val:170},
+    {name:'RTA Registration',val:370},
+  ],
+  first: [
+    {name:'Down Payment',          val:18500},
+    {name:'Evaluation + Reports',  val:770},
+    {name:'Bank Fees',             val:777},
+    {name:'Comprehensive Insurance',val:3700},
+    {name:'Plates + RTA + Salik',  val:1265},
+    {name:'Recovery + Fines',      val:200},
+  ]
+};
+
+function loadRegCosts(type) {
+  try { const v=localStorage.getItem('reg_'+type); return v?JSON.parse(v):[...REG_DEFAULTS[type]]; } catch(e){ return [...REG_DEFAULTS[type]]; }
+}
+function saveRegCosts(type,data){ try{localStorage.setItem('reg_'+type,JSON.stringify(data));}catch(e){} }
+
+function renderRegCosts() {
+  ['renewal','first'].forEach(type => {
+    const data = loadRegCosts(type);
+    const total = data.reduce((s,r)=>s+(parseFloat(r.val)||0),0);
+    const rows = data.map((r,i)=>`
+      <div class="li-row">
+        <span class="li-name">${r.name}</span>
+        <span class="li-val" style="display:flex;align-items:center;gap:6px">
+          AED <input type="number" value="${r.val}" onchange="updateRegRow('${type}',${i},this.value)"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:13px;font-weight:600;color:var(--text);width:80px;text-align:right;outline:none"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+        </span>
+      </div>`).join('');
+    document.getElementById('reg-'+type+'-rows').innerHTML = rows +
+      `<div class="li-row" style="border-top:1px solid var(--border2);margin-top:4px;padding-top:10px">
+        <span class="li-name" style="font-weight:700">Total</span>
+        <span class="li-val" style="font-weight:700;color:var(--gold)">AED ${fmtN(total)}</span>
+      </div>`;
+  });
+}
+
+function updateRegRow(type, i, val) {
+  const data = loadRegCosts(type);
+  data[i].val = parseFloat(val)||0;
+  saveRegCosts(type, data);
+  renderRegCosts();
+}
+
+function resetRegCosts(type) {
+  saveRegCosts(type, [...REG_DEFAULTS[type]]);
+  renderRegCosts();
+  showToast('Reset to defaults ✓');
+}
+
+function saveCleaningSettings() {
+  const newSess = parseInt(document.getElementById('s-clean-sess').value)||15;
+  settings.cleanStart  = document.getElementById('s-clean-start').value||'2026-06-19';
+  settings.cleanPrice  = parseFloat(document.getElementById('s-clean-price').value)||94.5;
+  if(newSess !== settings.cleanSess) {
+    const old = cleanData.sessions;
+    cleanData.sessions = Array(newSess).fill(false).map((_,i)=>i<old.length?old[i]:false);
+    saveClean();
+  }
+  settings.cleanSess = newSess;
+  saveSettings2();
+  renderCleaning();
+  showToast('Cleaning settings saved ✓');
+}
+
+function saveKM() {
+  const km = parseFloat(document.getElementById('s-km').value);
+  if(!km||isNaN(km)){showToast('Enter a valid KM');return;}
+  settings.currentKM = km;
+  saveSettings2();
+  renderMaintenance();
+  showToast('Mileage updated ✓');
+}
+
+// ═══════════════════════════════════════
+//  TRIP CALCULATOR
+// ═══════════════════════════════════════
+// Live prices — updated on load, fallback to latest known
+let LIVE_PRICES = { super98: 3.95, special95: 3.83, eplus91: 3.76, month: 'June 2026', fetched: false };
+
+async function fetchLiveFuelPrices() {
+  const priceBox = document.getElementById('fuel-price-box');
+  if (priceBox) priceBox.innerHTML = '<span style="color:var(--text-mute)">Checking latest prices…</span>';
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 200,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{
+          role: 'user',
+          content: 'What are the current UAE petrol prices per litre in AED for Super 98, Special 95, and E-Plus 91 this month? Reply ONLY with a JSON object like: {"super98":3.95,"special95":3.83,"eplus91":3.76,"month":"June 2026"} — no other text.'
+        }]
+      })
+    });
+    if (!resp.ok) throw new Error('API error ' + resp.status);
+    const data = await resp.json();
+    // Extract text from content blocks
+    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+    const match = text.match(/\{[^}]+\}/);
+    if (match) {
+      const parsed = JSON.parse(match[0]);
+      if (parsed.super98 && parsed.special95 && parsed.eplus91) {
+        LIVE_PRICES = { ...parsed, fetched: true };
+        updateFuelPriceUI();
+        saveFuelPriceCache(LIVE_PRICES);
+      }
+    }
+  } catch(e) {
+    // Silently fall back to cached/default — load from localStorage if available
+    const cached = loadFuelPriceCache();
+    if (cached) LIVE_PRICES = cached;
+    updateFuelPriceUI();
+  }
+}
+
+function saveFuelPriceCache(p) { try { localStorage.setItem('fuel_prices', JSON.stringify(p)); } catch(e){} }
+function loadFuelPriceCache() { try { const v=localStorage.getItem('fuel_prices'); return v?JSON.parse(v):null; } catch(e){return null;} }
+
+function updateFuelPriceUI() {
+  // Update price display box in trip calculator
+  const box = document.getElementById('fuel-price-box');
+  if (box) {
+    const age = LIVE_PRICES.fetched ? 'Live' : 'Cached';
+    box.innerHTML = `<span style="color:var(--text-mute);font-size:10px">${age} · ${LIVE_PRICES.month}</span>
+      <span style="color:var(--gold)">Super 98: AED ${LIVE_PRICES.super98}/L</span>
+      <span style="color:var(--text-dim)">Special 95: AED ${LIVE_PRICES.special95}/L</span>
+      <span style="color:var(--text-mute)">E-Plus 91: AED ${LIVE_PRICES.eplus91}/L</span>`;
+  }
+  // Update the fuel type select options
+  const sel = document.getElementById('tr-fuel');
+  if (sel) {
+    sel.innerHTML = [
+      ['super98',   'Super 98'],
+      ['special95', 'Special 95'],
+      ['eplus91',   'E-Plus 91'],
+    ].map(([k, lbl]) => `<option value="${LIVE_PRICES[k]}">${lbl} — AED ${LIVE_PRICES[k]}/L</option>`).join('');
+  }
+  // Also update loan page header if visible
+  const lph = document.getElementById('loan-price-note');
+  if (lph) lph.textContent = LIVE_PRICES.month + ' prices';
+  calcTrip();
+}
+
+function calcTrip() {
+  const dist = parseFloat(document.getElementById('tr-dist').value)||0;
+  const pricePerL = parseFloat(document.getElementById('tr-fuel').value)||3.95;
+  const consRaw = parseFloat(document.getElementById('tr-cons').value)||9.5;
+  const consUnit = document.getElementById('tr-cons-unit').value;
+  // Normalise to L/100km for calculation
+  const cons = consUnit === 'kml' ? (100 / consRaw) : consRaw;
+  const salik = parseFloat(document.getElementById('tr-salik').value)||0;
+  const mult = parseInt(document.getElementById('tr-round').value)||1;
+  if (!dist) { document.getElementById('trip-result').innerHTML=''; return; }
+  const totalDist = dist * mult;
+  const litresNeeded = (totalDist * cons) / 100;
+  const fuelCost = litresNeeded * pricePerL;
+  const salikTotal = salik * mult;
+  const total = fuelCost + salikTotal;
+  const costPerKm = total / totalDist;
+  const resultHTML = `
+    <div class="loan-result">
+      <div class="lr-row"><span>Distance</span><span>${totalDist} km${mult===2?' (round trip)':''}</span></div>
+      <div class="lr-row"><span>Fuel needed</span><span>${litresNeeded.toFixed(1)} litres</span></div>
+      <div class="lr-row"><span>Fuel cost</span><span>AED ${fuelCost.toFixed(2)}</span></div>
+      <div class="lr-row"><span>Salik / tolls</span><span>AED ${salikTotal.toFixed(2)}</span></div>
+      <div class="lr-row"><span>Cost per KM</span><span>AED ${costPerKm.toFixed(2)}</span></div>
+      <div class="lr-row"><span>Total Trip Cost</span><span>AED ${total.toFixed(2)}</span></div>
+    </div>`;
+  document.getElementById('trip-result').innerHTML = resultHTML;
+
+  // Save to history (last 3)
+  const fuelLabel = document.getElementById('tr-fuel');
+  const fuelName  = fuelLabel ? fuelLabel.options[fuelLabel.selectedIndex].text.split(' —')[0] : 'Super 98';
+  const entry = {
+    ts: Date.now(),
+    dist: totalDist, round: mult===2,
+    fuelName, cons: consRaw, consUnit,
+    salik: salikTotal, fuelCost, total,
+  };
+  tripHistory.unshift(entry);
+  tripHistory = tripHistory.slice(0, 3);
+  saveTripHistory();
+  renderTripHistory();
+}
+
+function renderTripHistory() {
+  const card = document.getElementById('trip-history-card');
+  const list = document.getElementById('trip-history-list');
+  if (!card || !list) return;
+  if (!tripHistory.length) { card.style.display='none'; return; }
+  card.style.display='block';
+  list.innerHTML = tripHistory.map((t,i) => {
+    const ago = formatAgo(t.ts);
+    const consStr = t.consUnit==='kml' ? `${t.cons} km/L` : `${t.cons} L/100km`;
+    return `<div class="li-row" style="${i<tripHistory.length-1?'':'border-bottom:none'}">
+      <div>
+        <div style="font-size:13px;font-weight:600">${t.dist} km${t.round?' return':''} · ${t.fuelName}</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:3px">${consStr} · Salik AED ${t.salik.toFixed(0)} · ${ago}</div>
+      </div>
+      <div style="font-size:15px;font-weight:700;color:var(--gold);white-space:nowrap">AED ${t.total.toFixed(2)}</div>
+    </div>`;
+  }).join('');
+}
+
+function formatAgo(ts) {
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff/60000);
+  if (m < 1)   return 'just now';
+  if (m < 60)  return m + 'm ago';
+  const h = Math.floor(m/60);
+  if (h < 24)  return h + 'h ago';
+  return Math.floor(h/24) + 'd ago';
+}
+
+function setTripPreset(dist, salik, cons, unit, round) {
+  document.getElementById('tr-dist').value  = dist;
+  document.getElementById('tr-salik').value = salik;
+  document.getElementById('tr-cons').value  = cons;
+  // Set unit dropdown
+  const unitSel = document.getElementById('tr-cons-unit');
+  if (unitSel) { unitSel.value = unit || 'kml'; }
+  // Set round trip dropdown
+  const roundSel = document.getElementById('tr-round');
+  if (roundSel) { roundSel.value = round || '1'; }
+  // All presets use Super 98
+  const fuelSel = document.getElementById('tr-fuel');
+  if (fuelSel) { fuelSel.selectedIndex = 0; }
+  calcTrip();
+  document.getElementById('content').scrollTo({top:0,behavior:'smooth'});
+}
+
+
+
+
+// ─── Confirm-delete helper ───────────────────────────
+function confirmDelete(itemLabel, onConfirm) {
+  // Inject a confirm overlay on top of the current modal content
+  const existing = document.getElementById('confirm-overlay-el');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  overlay.id = 'confirm-overlay-el';
+  overlay.innerHTML = `
+    <div class="confirm-msg">Delete this entry?<span>${itemLabel}</span></div>
+    <div class="confirm-btns">
+      <button class="confirm-cancel" onclick="document.getElementById('confirm-overlay-el').remove()">Cancel</button>
+      <button class="confirm-go" onclick="doConfirmDelete()">Delete</button>
+    </div>`;
+  document.getElementById('modal').appendChild(overlay);
+  window._confirmDeleteFn = onConfirm;
+}
+function doConfirmDelete() {
+  const fn = window._confirmDeleteFn;
+  window._confirmDeleteFn = null;
+  const el = document.getElementById('confirm-overlay-el');
+  if (el) el.remove();
+  if (fn) fn();
+}
+
+// ═══════════════════════════════════════
+//  EXPORT / IMPORT
+// ═══════════════════════════════════════
+function exportData() {
+  const data = {
+    version: 2,
+    exported: new Date().toISOString(),
+    fuel: fuelData,
+    spend: spendData,
+    car: carData,
+    service: svcData,
+    issues: issuesData,
+    mods: modsData,
+    cleaning: cleanData,
+    settings: settings,
+    regCosts: regCosts,
+    tripHistory: tripHistory,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'mytracker-backup-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Exported ✓');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (!d.version || !d.fuel) { showToast('Invalid backup file'); return; }
+      if (!confirm('Replace ALL your data with this backup? This cannot be undone.')) return;
+      if (d.fuel)     { fuelData    = d.fuel;     saveFuel(); }
+      if (d.spend)    { spendData   = d.spend;    saveSpend(); }
+      if (d.car)      { carData     = d.car;      saveCar(); }
+      if (d.service)  { svcData     = d.service;  saveSvc(); }
+      if (d.issues)   { issuesData  = d.issues;   saveIssues(); }
+      if (d.mods)     { modsData    = d.mods;     saveMods(); }
+      if (d.cleaning) { cleanData   = d.cleaning; saveClean(); }
+      if (d.settings) { settings    = d.settings; saveSettings2(); applyTheme(); }
+      if (d.regCosts) { regCosts    = d.regCosts; saveRegCosts(); }
+      if (d.tripHistory) { tripHistory = d.tripHistory; saveTripHistory(); }
+      renderDashboard();
+      showToast('Import successful ✓');
+    } catch(err) {
+      showToast('Failed to read file');
+    }
+    event.target.value = ''; // reset input
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  applyTheme();
+  renderDashboard();
+  // Pre-load cached fuel prices, then fetch fresh in background
+  renderRegCosts();
+  const cachedPrices = loadFuelPriceCache();
+  if (cachedPrices) { LIVE_PRICES = cachedPrices; }
+  // Fetch fresh prices silently in background
+  setTimeout(() => fetchLiveFuelPrices(), 1200);
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+});
+</script>
+</body>
+</html>
