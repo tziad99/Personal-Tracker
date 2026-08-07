@@ -4,11 +4,12 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <meta name="theme-color" content="#0a0a0b"/>
+<meta name="description" content="Daftar — your personal tracker"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="My Tracker"/>
+<meta name="apple-mobile-web-app-title" content="Daftar"/>
 <link rel="manifest" href="manifest.json"/>
-<title>Personal Tracker</title>
+<title>Daftar | دفتر</title>
 <style>
 /* ─── PREMIUM THEME TOKENS ─── */
 :root {
@@ -66,11 +67,16 @@ svg{display:block}
   flex-shrink:0;
   position:relative;
 }
-.logo{font-size:16px;font-weight:800;letter-spacing:.5px;color:var(--text)}
+.logo{font-size:19px;font-weight:800;letter-spacing:1px;color:var(--text);font-family:"Geeza Pro","Arial Unicode MS",serif}
 .logo em{color:var(--gold);font-style:normal}
 #page-title{flex:1;font-size:14px;font-weight:500;color:var(--text-dim);text-align:center;letter-spacing:.2px}
 .date-pill{font-size:11px;color:var(--text-dim);white-space:nowrap;flex-shrink:0}
 #burger-btn{width:34px;height:34px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex-shrink:0;border-radius:8px;background:var(--surface2);border:1px solid var(--border)}
+[dir="rtl"] #header{flex-direction:row-reverse}
+[dir="rtl"] #page-title{text-align:center}
+[dir="rtl"] #burger-btn{order:-1}
+[dir="rtl"] .logo{order:1}
+[dir="rtl"] .date-pill{order:0}
 #burger-btn span{display:block;width:16px;height:1.5px;background:var(--text-dim);border-radius:2px;transition:all .3s}
 
 /* ─── SCROLL ─── */
@@ -95,12 +101,14 @@ svg{display:block}
 #menu-overlay{display:none;position:fixed;inset:0;z-index:300}
 #menu-overlay.open{display:block}
 #menu-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-#menu-drawer{position:absolute;top:0;right:0;width:80%;max-width:310px;height:100%;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;animation:slideR .22s ease}
+#menu-drawer{position:absolute;top:0;right:0;width:80%;max-width:310px;height:100%;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;animation:slideR .22s ease;transition:right .2s,left .2s}
+[dir="rtl"] #menu-drawer{right:auto;left:0;border-left:none;border-right:1px solid var(--border);animation:slideL .22s ease}
 @keyframes slideR{from{transform:translateX(102%)}to{transform:translateX(0)}}
-#menu-top{padding:52px 20px 18px;border-bottom:1px solid var(--border)}
-#menu-top .ml{font-size:19px;font-weight:800;color:var(--text)}
+@keyframes slideL{from{transform:translateX(-102%)}to{transform:translateX(0)}}
+#menu-top{padding:52px 20px 18px;border-bottom:1px solid var(--border);text-align:center}
+#menu-top .ml{font-size:19px;font-weight:800;color:var(--text);text-align:center}
 #menu-top .ml em{color:var(--gold);font-style:normal}
-#menu-top .ms{font-size:11px;color:var(--text-mute);margin-top:3px;letter-spacing:.3px}
+#menu-top .ms{font-size:11px;color:var(--text-mute);margin-top:3px;letter-spacing:.3px;text-align:center}
 #menu-list{flex:1;overflow-y:auto;padding:8px 0 20px}
 .msec{font-size:10px;font-weight:700;letter-spacing:1.8px;color:var(--text-mute);padding:18px 20px 7px;text-transform:uppercase}
 .mi{display:flex;align-items:center;gap:13px;padding:12px 20px;cursor:pointer;transition:background .12s;border-left:2px solid transparent}
@@ -160,9 +168,9 @@ svg{display:block}
 
 /* ─── PROGRESS BAR ─── */
 .pb-wrap{margin-bottom:13px}
-.pb-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
-.pb-lbl{font-size:13px}
-.pb-val{font-size:11px;color:var(--text-dim)}
+.pb-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;gap:6px}
+.pb-lbl{font-size:13px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb-val{font-size:11px;color:var(--text-dim);flex-shrink:0;display:flex;align-items:center;gap:2px;white-space:nowrap}
 .pb-track{height:5px;background:var(--surface3);border-radius:3px;overflow:hidden}
 .pb-fill{height:100%;border-radius:3px;transition:width .8s ease}
 .pb-fill.ac{background:var(--gold)}
@@ -292,7 +300,7 @@ svg{display:block}
 /* ─── THEME TOGGLE ─── */
 .theme-toggle{display:flex;background:var(--surface2);border-radius:8px;border:1px solid var(--border);overflow:hidden}
 .theme-opt{flex:1;padding:7px 12px;font-size:12px;font-weight:600;text-align:center;transition:all .2s;color:var(--text-dim)}
-.theme-opt.active{background:var(--gold);color:#0a0a0b}
+.theme-opt.active{background:var(--gold);color:#0a0a0b;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.15)}
 
 /* ─── TOAST ─── */
 #toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);color:var(--text);font-size:13px;font-weight:600;padding:12px 22px;border-radius:24px;opacity:0;transition:opacity .25s,transform .25s;z-index:9999;white-space:nowrap;pointer-events:none;border:1px solid var(--border2);box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:90vw;text-align:center}
@@ -348,6 +356,45 @@ svg{display:block}
 .confirm-go{background:var(--red);color:#fff}
 #modal{position:relative}
 
+
+/* ─── CURRENCY BUTTONS ─── */
+/* currency-btn removed — now using select */
+
+
+/* ─── NAV PAGE PICKER ─── */
+.nav-pick-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .2s}
+.nav-pick-item:last-child{border-bottom:none}
+.nav-pick-item.disabled{opacity:.35;cursor:default}
+.nav-pick-item.selected .nav-pick-check{background:var(--gold);border-color:var(--gold);color:#0a0a0b}
+.nav-pick-icon{width:28px;height:28px;flex-shrink:0;color:var(--text-dim)}
+.nav-pick-icon svg{width:22px;height:22px}
+.nav-pick-lbl{flex:1;font-size:13px}
+.nav-pick-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;transition:all .2s}
+
+
+/* ─── NAV DRAG REORDER ─── */
+.nav-drag-item{touch-action:none}
+.nav-drag-item[draggable]:active{opacity:.6}
+.nav-drag-item .nav-pick-check{border-color:var(--gold);background:var(--gold-glow);color:var(--gold)}
+
+
+/* ─── LOAN SLIDER UX ─── */
+.lc-row{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.lc-row:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.lc-label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.lc-lbl{font-size:15px;font-weight:600}
+.lc-val-box{display:flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 10px}
+.lc-sym{font-size:12px;color:var(--text-dim)}
+.lc-input{background:none;border:none;outline:none;font-size:13px;font-weight:600;color:var(--text);text-align:right;width:60px}
+.lc-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--border);outline:none;cursor:pointer}
+.lc-slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--gold);cursor:pointer;box-shadow:0 2px 8px rgba(201,168,76,.4);border:2px solid var(--bg)}
+.lc-slider::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg);box-shadow:0 2px 8px rgba(201,168,76,.4)}
+.lc-yr-btn{flex:1;padding:10px 0;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface2);font-size:14px;font-weight:600;color:var(--text-dim);cursor:pointer;transition:all .15s}
+.lc-yr-btn.active{background:var(--gold);border-color:var(--gold);color:#0a0a0b}
+.lc-yr-btn:active{opacity:.7}
+#loan-summary-card .lr-row{display:flex;justify-content:space-between;padding:7px 0;font-size:13px;border-bottom:1px solid var(--border)}
+#loan-summary-card .lr-row:last-child{border-bottom:none}
+
 </style>
 </head>
 <body>
@@ -355,7 +402,7 @@ svg{display:block}
 
 <!-- HEADER -->
 <div id="header">
-  <div class="logo">MY<em>.</em>T</div>
+  <div class="logo">دفتر<em>.</em></div>
   <div id="page-title">Dashboard</div>
   <div class="date-pill" id="date-badge"></div>
   <button id="burger-btn" onclick="toggleMenu()">
@@ -369,24 +416,24 @@ svg{display:block}
   <!-- ══ DASHBOARD ══ -->
   <div class="page active" id="page-dashboard">
     <div class="card gold-edge">
-      <div class="card-title">⛽ Fuel This Month</div>
+      <div class="card-title" id="card-fuel-month">⛽ Fuel This Month</div>
       <div class="gauge-wrap">
         <svg width="198" height="115" viewBox="0 0 200 115" style="overflow:visible">
           <path class="g-track" d="M20 108 A80 80 0 0 1 180 108"/>
           <path class="g-fill" id="gauge-fill" d="M20 108 A80 80 0 0 1 180 108" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
           <text text-anchor="middle" x="100" y="86" style="font-size:26px;font-weight:800;fill:var(--text)" id="gauge-val">0</text>
-          <text text-anchor="middle" x="100" y="104" style="font-size:11px;fill:var(--text-dim)">AED this month</text>
+          <text text-anchor="middle" x="100" y="104" id="gauge-unit-text" style="font-size:11px;fill:var(--text-dim)">AED this month</text>
         </svg>
         <div class="gauge-meta" id="gauge-meta"></div>
       </div>
     </div>
     <div class="stat-row">
-      <div class="stat ac"><div class="sv" id="d-salary">—</div><div class="sl">Salary</div></div>
-      <div class="stat am"><div class="sv" id="d-spent">—</div><div class="sl">Monthly Spend</div></div>
-      <div class="stat" id="d-scard"><div class="sv" id="d-saving">—</div><div class="sl">Actual Saving</div></div>
+      <div class="stat ac"><div class="sv" id="d-salary">—</div><div class="sl" id="d-salary-lbl">Salary</div></div>
+      <div class="stat am"><div class="sv" id="d-spent">—</div><div class="sl" id="lbl-monthly-spend">Monthly Spend</div></div>
+      <div class="stat" id="d-scard"><div class="sv" id="d-saving">—</div><div class="sl" id="lbl-actual-saving">Actual Saving</div></div>
     </div>
     <div class="card">
-      <div class="card-title">💰 Savings Health</div>
+      <div class="card-title" id="card-savings-health">💰 Savings Health</div>
       <div class="ring-wrap">
         <svg width="76" height="76" viewBox="0 0 80 80">
           <circle class="ring-track" cx="40" cy="40" r="30"/>
@@ -394,25 +441,25 @@ svg{display:block}
         </svg>
         <div class="ri">
           <div class="rb" id="saving-pct">0%</div>
-          <div class="rs">of 20% target</div>
+          <div class="rs" id="saving-target-lbl">of 20% target</div>
           <div class="rg" id="saving-gap"></div>
         </div>
       </div>
     </div>
     <div class="card">
-      <div class="card-title">📈 Monthly Fuel Spend</div>
+      <div class="card-title" id="card-monthly-chart">📈 Monthly Fuel Spend</div>
       <div class="bar-chart" id="mini-chart"></div>
     </div>
-    <div class="sec-hd"><h2>Recent Fill-ups</h2><span class="see-all" onclick="switchPage('fuel')">See all →</span></div>
+    <div class="sec-hd"><h2 id="lbl-recent-fills">Recent Fill-ups</h2><span class="see-all" onclick="switchPage('fuel')" id="lbl-see-all">See all →</span></div>
     <div class="log-list" id="recent-fills"></div>
   </div>
 
   <!-- ══ FUEL ══ -->
   <div class="page" id="page-fuel">
     <div class="stat-row">
-      <div class="stat ac"><div class="sv" id="f-yr">—</div><div class="sl">This Year</div></div>
-      <div class="stat am"><div class="sv" id="f-avg">—</div><div class="sl">Avg/Month</div></div>
-      <div class="stat"><div class="sv" id="f-cnt">—</div><div class="sl">Fill-ups</div></div>
+      <div class="stat ac"><div class="sv" id="f-yr">—</div><div class="sl" id="lbl-f-yr">This Year</div></div>
+      <div class="stat am"><div class="sv" id="f-avg">—</div><div class="sl" id="lbl-f-avg">Avg/Month</div></div>
+      <div class="stat"><div class="sv" id="f-cnt">—</div><div class="sl" id="lbl-f-cnt">Fill-ups</div></div>
     </div>
     <div class="pill-row" id="year-pills" style="display:flex;gap:8px;overflow-x:auto;margin-bottom:8px;scrollbar-width:none"></div>
     <div class="pill-row" id="month-pills" style="display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none"></div>
@@ -421,53 +468,64 @@ svg{display:block}
 
   <!-- ══ BUDGET ══ -->
   <div class="page" id="page-budget">
-    <div class="card"><div class="card-title">📊 Monthly Snapshot</div><div id="bgt-snap"></div></div>
+    <div class="card"><div class="card-title" id="card-monthly-snapshot">📊 Monthly Snapshot</div><div id="bgt-snap"></div></div>
     <div class="card">
-      <div class="card-title">🧾 Spending Breakdown</div>
+      <div class="card-title" id="card-spending-breakdown">🧾 Spending Breakdown</div>
       <div id="bgt-break"></div>
       <div class="add-row" id="bgt-add-row">
-        <input id="bgt-new-name" placeholder="Category name"/>
-        <input id="bgt-new-amt" placeholder="AED/mo" type="number" style="width:90px"/>
-        <button class="add-btn" onclick="addBudgetItem()">Add</button>
+        <input id="bgt-new-name" id="bgt-new-name"/>
+        <input id="bgt-new-amt" type="number" style="width:90px"/>
+        <button class="add-btn" id="btn-add-budget-item" onclick="addBudgetItem()">Add</button>
       </div>
     </div>
-    <div class="card"><div class="card-title">🚗 Car Cost Detail</div><div id="car-break"></div></div>
+    <div class="card"><div class="card-title" id="card-car-cost-detail">🚗 Car Cost Detail</div><div id="car-break"></div></div>
   </div>
 
   <!-- ══ CLEANING ══ -->
   <div class="page" id="page-cleaning">
     <div class="stat-row">
-      <div class="stat gr"><div class="sv" id="cl-done">—</div><div class="sl">Done</div></div>
-      <div class="stat"><div class="sv" id="cl-total">—</div><div class="sl">Sessions</div></div>
-      <div class="stat ac"><div class="sv" id="cl-cost">—</div><div class="sl">Cost (AED)</div></div>
+      <div class="stat gr" style="flex:2;text-align:center">
+        <div class="sv" id="cl-done-combined">—</div>
+        <div class="sl" id="lbl-cl-done">Done</div>
+      </div>
+      <div class="stat ac" style="text-align:center"><div class="sv" id="cl-cost">—</div><div class="sl" id="lbl-cl-cost-stat">Cost</div></div>
     </div>
     <div class="card">
-      <div class="card-title">🧼 Cleaning Grid – Tap to Mark</div>
+      <div class="card-title" id="card-cleaning-grid">🧼 Cleaning Grid – Tap to Mark</div>
       <div class="clean-grid" id="clean-grid"></div>
     </div>
     <div class="card">
-      <div class="card-title">📋 Subscription Info</div>
-      <div class="li-row"><span class="li-name">Price per session</span><span class="li-val" id="cl-price-disp">—</span></div>
-      <div class="li-row"><span class="li-name">Monthly subscription</span><span class="li-val" id="cl-sub-disp">—</span></div>
-      <div class="li-row"><span class="li-name">Sessions per month</span><span class="li-val" id="cl-sess-disp">—</span></div>
-      <div class="li-row"><span class="li-name">Schedule start</span><span class="li-val" id="cl-start-disp">—</span></div>
-    </div>
-    <div class="card">
-      <div class="card-title">⚙️ Cleaning Settings</div>
-      <div class="setting-row">
-        <div><div class="setting-lbl">Start Date</div></div>
-        <div class="setting-val"><input type="date" id="s-clean-start" style="width:auto;text-align:left"/></div>
+      <div class="card-title" id="cl-sub-title">📋 Subscription Info</div>
+      <!-- Price per session — read only, computed -->
+      <div class="li-row">
+        <span class="li-name" id="lbl-cl-price-sess">Price per session</span>
+        <span class="li-val" id="cl-price-disp">—</span>
       </div>
-      <div class="setting-row">
-        <div><div class="setting-lbl">Sessions / Month</div></div>
-        <div class="setting-val"><input type="number" id="s-clean-sess"/></div>
+      <!-- Monthly Cost — display value + pen to edit -->
+      <div class="li-row">
+        <span class="li-name" id="lbl-cl-monthly">Monthly Cost</span>
+        <span class="li-val" style="display:flex;align-items:center;gap:6px">
+          <span id="cl-sub-val">—</span>
+          <button class="edit-btn" onclick="editCleanSetting('price')" title="Edit"><svg class="pen-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        </span>
       </div>
-      <div class="setting-row">
-        <div><div class="setting-lbl">Monthly Cost</div><div class="setting-sub">AED</div></div>
-        <div class="setting-val"><input type="number" id="s-clean-price"/></div>
+      <!-- Sessions / Month -->
+      <div class="li-row">
+        <span class="li-name" id="lbl-cl-sessions">Sessions / Month</span>
+        <span class="li-val" style="display:flex;align-items:center;gap:6px">
+          <span id="cl-sess-val">—</span>
+          <button class="edit-btn" onclick="editCleanSetting('sessions')" title="Edit"><svg class="pen-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        </span>
       </div>
-      <button class="save-settings-btn" style="margin-top:14px" onclick="saveCleaningSettings()">Save Cleaning Settings</button>
-      <button class="btn-del" style="margin-top:8px;width:100%;padding:13px;border-radius:var(--r-sm)" onclick="resetCleanSessions()">🔄 Reset All Sessions</button>
+      <!-- Start Date -->
+      <div class="li-row">
+        <span class="li-name" id="lbl-cl-start">Start Date</span>
+        <span class="li-val" style="display:flex;align-items:center;gap:6px">
+          <span id="cl-start-val">—</span>
+          <button class="edit-btn" onclick="editCleanSetting('start')" title="Edit"><svg class="pen-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        </span>
+      </div>
+      <button class="btn-del" style="margin-top:12px;width:100%;padding:13px;border-radius:var(--r-sm)" onclick="resetCleanSessions()" id="btn-reset-sessions">🔄 Reset All Sessions</button>
     </div>
   </div>
 
@@ -488,19 +546,28 @@ svg{display:block}
       </div>
     </div>
     <div class="stat-row">
-      <div class="stat ac"><div class="sv" id="m-km">—</div><div class="sl">Avg/Year Spend</div></div>
-      <div class="stat ac"><div class="sv" id="m-next">—</div><div class="sl">Next Service</div></div>
-      <div class="stat am"><div class="sv" id="m-total">—</div><div class="sl">Total Spent</div></div>
+      <div class="stat ac"><div class="sv" id="m-km">—</div><div class="sl" id="lbl-m-km">Avg/Year Spend</div></div>
+      <div class="stat ac"><div class="sv" id="m-next">—</div><div class="sl" id="lbl-m-next">Next Service</div></div>
+      <div class="stat am"><div class="sv" id="m-total">—</div><div class="sl" id="lbl-m-total">Total Spent</div></div>
     </div>
     <div class="card"><div class="card-title">📅 Next Service Intervals</div><div id="svc-intervals"></div></div>
     <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div class="card-title" style="margin-bottom:0">🔧 Service History</div>
-        <select id="svc-yr-filter" onchange="renderMaintenance()" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:5px 8px;font-size:12px;color:var(--text-dim);-webkit-appearance:none;outline:none">
-          <option value="">All Years</option>
+      <div class="card-title">➕ Add Service Record</div>
+      <!-- Type dropdown — auto-fills name -->
+      <div style="margin-bottom:10px">
+        <select id="svc-type" onchange="onSvcTypeChange()"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:11px 12px;font-size:14px;color:var(--text);outline:none;-webkit-appearance:none;appearance:none">
+          <option value="">— Select type (optional) —</option>
+          <option value="Oil &amp; Filter Change">Oil &amp; Filter Change</option>
+          <option value="Cabin Air Filter">Cabin Air Filter</option>
+          <option value="Drive Belts &amp; Hoses">Drive Belts &amp; Hoses</option>
+          <option value="Brake Fluid + Spark Plugs">Brake Fluid + Spark Plugs</option>
+          <option value="Fuel System + Diff Fluid">Fuel System + Diff Fluid</option>
+          <option value="Transmission + Coolant Flush">Transmission + Coolant Flush</option>
+          <option value="Air Intake Filters">Air Intake Filters</option>
+          <option value="__custom__">✏️ Custom / Other</option>
         </select>
       </div>
-      <div id="svc-history"></div>
       <div class="add-row" style="flex-wrap:wrap;gap:6px">
         <input id="svc-name" placeholder="Service name" style="flex:2;min-width:120px"/>
         <input id="svc-km" placeholder="KM" type="number" style="width:80px"/>
@@ -508,6 +575,29 @@ svg{display:block}
         <input id="svc-from" placeholder="From" style="width:90px"/>
         <button class="add-btn" onclick="addService()">Add</button>
       </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)">
+        <label for="svc-receipt" style="font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;-webkit-tap-highlight-color:transparent">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span id="svc-receipt-label">📎 Attach receipt (optional)</span>
+        </label>
+        <input type="file" id="svc-receipt" accept="image/*"
+          style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
+          onchange="previewReceipt()"/>
+        <span id="svc-receipt-preview" style="font-size:11px;color:var(--green);display:none">✓ Attached</span>
+        <button id="svc-receipt-clear" onclick="clearReceipt()" style="display:none;font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;padding:4px">✕</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="card-title" style="margin-bottom:0">🔧 Service History</div>
+        <select id="svc-yr-filter" onchange="renderMaintenance()" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:5px 8px;font-size:12px;color:var(--text-dim);-webkit-appearance:none;outline:none">
+          <option value="">All Years</option>
+        </select>
+      </div>
+      <input id="svc-search" type="text" placeholder="🔍 Search service records…"
+        oninput="renderMaintenance()"
+        style="width:100%;box-sizing:border-box;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;font-size:13px;color:var(--text);outline:none;margin-bottom:12px"/>
+      <div id="svc-history"></div>
     </div>
   </div>
 
@@ -554,27 +644,90 @@ svg{display:block}
 
   <!-- ══ LOAN CALC ══ -->
   <div class="page" id="page-loan">
-    <div class="card gold-edge">
-      <div class="card-title">🚘 Car Loan Calculator</div>
-      <div class="field"><label>Car Price (AED)</label><input type="number" id="lc-price" value="60000" oninput="calcLoan()"/></div>
-      <div class="field-row">
-        <div class="field"><label>Down Payment %</label><input type="number" id="lc-dp" value="20" oninput="calcLoan()"/></div>
-        <div class="field"><label>Years</label><input type="number" id="lc-years" value="5" oninput="calcLoan()"/></div>
+    <!-- Summary card at top -->
+    <div class="card gold-edge" id="loan-summary-card">
+      <div style="text-align:center;padding:4px 0 8px">
+        <div style="font-size:12px;color:var(--text-dim);letter-spacing:.5px;margin-bottom:4px" id="lbl-monthly-pmt">Monthly Payment</div>
+        <div style="font-size:38px;font-weight:800;color:var(--gold);letter-spacing:-1px" id="lc-ppm-display">—</div>
       </div>
-      <div class="field"><label>Bank Interest % /year</label><input type="number" id="lc-rate" value="3.8427" step="0.01" oninput="calcLoan()"/></div>
-      <div class="loan-result" id="loan-result"></div>
+      <div style="height:1px;background:var(--border);margin:8px 0"></div>
+      <div class="lr-row"><span id="lbl-total-loan">Total Loan Amount</span><span id="lc-financed-display">—</span></div>
+      <div class="lr-row"><span id="lbl-total-interest-lbl">Total Interest</span><span id="lc-interest-display">—</span></div>
+      <div class="lr-row" style="border-top:1px solid var(--border2);margin-top:4px;padding-top:8px"><span id="lbl-total-repay">Total Repayment</span><span id="lc-total-display" style="font-weight:700;color:var(--gold)">—</span></div>
     </div>
+
+    <!-- Sliders card -->
+    <div class="card">
+      <!-- Car Price -->
+      <div class="lc-row">
+        <div class="lc-label-row">
+          <span class="lc-lbl" id="lbl-lc-price">Car Price</span>
+          <div class="lc-val-box">
+            <span class="lc-sym" id="lc-price-sym">AED</span>
+            <input type="number" id="lc-price" value="60000" min="10000" max="500000" step="1000" oninput="syncSlider('lc-price','lc-price-sl',10000,500000);calcLoan()" class="lc-input"/>
+          </div>
+        </div>
+        <input type="range" id="lc-price-sl" class="lc-slider" min="10000" max="500000" step="1000" value="60000" oninput="syncInput('lc-price-sl','lc-price');calcLoan()"/>
+      </div>
+
+      <!-- Down Payment -->
+      <div class="lc-row">
+        <div class="lc-label-row">
+          <span class="lc-lbl" id="lbl-lc-dp">Down Payment</span>
+          <div style="display:flex;gap:6px">
+            <div class="lc-val-box">
+              <span class="lc-sym" id="lc-dp-sym">AED</span>
+              <span id="lc-dp-amt" style="font-size:13px;font-weight:600;color:var(--text);min-width:60px">12,000</span>
+            </div>
+            <div class="lc-val-box" style="min-width:56px">
+              <input type="number" id="lc-dp" value="20" min="0" max="80" step="1" oninput="syncSlider('lc-dp','lc-dp-sl',0,80);calcLoan()" class="lc-input" style="width:32px"/>
+              <span style="color:var(--text-dim);font-size:12px">%</span>
+            </div>
+          </div>
+        </div>
+        <input type="range" id="lc-dp-sl" class="lc-slider" min="0" max="80" step="1" value="20" oninput="syncInput('lc-dp-sl','lc-dp');calcLoan()"/>
+      </div>
+
+      <!-- Interest Rate -->
+      <div class="lc-row">
+        <div class="lc-label-row">
+          <span class="lc-lbl" id="lbl-lc-rate">Interest Rate</span>
+          <div class="lc-val-box">
+            <input type="number" id="lc-rate" value="3.84" min="0.5" max="15" step="0.01" oninput="syncSlider('lc-rate','lc-rate-sl',0.5,15);calcLoan()" class="lc-input" style="width:44px"/>
+            <span style="color:var(--text-dim);font-size:12px">%</span>
+          </div>
+        </div>
+        <input type="range" id="lc-rate-sl" class="lc-slider" min="0.5" max="15" step="0.01" value="3.84" oninput="syncInput('lc-rate-sl','lc-rate');calcLoan()"/>
+      </div>
+
+      <!-- Loan Period — pill buttons -->
+      <div class="lc-row" style="border-bottom:none">
+        <div class="lc-label-row" style="margin-bottom:12px">
+          <span class="lc-lbl" id="lbl-lc-years">Loan Period</span>
+          <span style="font-size:13px;color:var(--text-dim)"><span id="lc-years-display">5</span> <span id="lbl-lc-yrs-unit">yrs</span></span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="lc-yr-btn" onclick="setLoanYears(1)" id="lc-yr-1">1</button>
+          <button class="lc-yr-btn" onclick="setLoanYears(2)" id="lc-yr-2">2</button>
+          <button class="lc-yr-btn" onclick="setLoanYears(3)" id="lc-yr-3">3</button>
+          <button class="lc-yr-btn" onclick="setLoanYears(4)" id="lc-yr-4">4</button>
+          <button class="lc-yr-btn active" onclick="setLoanYears(5)" id="lc-yr-5">5</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Registration costs -->
     <div class="card" id="reg-renewal-card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div class="card-title" style="margin-bottom:0">📋 Annual Renewal Costs</div>
-        <button onclick="resetRegCosts('renewal')" style="font-size:11px;color:var(--gold);background:none;border:none;cursor:pointer;padding:0">↺ Reset</button>
+        <div class="card-title" style="margin-bottom:0" id="lbl-reg-renewal">📋 Annual Renewal Costs</div>
+        <button onclick="resetRegCosts('renewal')" style="font-size:11px;color:var(--gold);background:none;border:none;cursor:pointer;padding:0" id="lbl-reset-renewal">↺ Reset</button>
       </div>
       <div id="reg-renewal-rows"></div>
     </div>
     <div class="card" id="reg-first-card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div class="card-title" style="margin-bottom:0">📋 First-Time Registration</div>
-        <button onclick="resetRegCosts('first')" style="font-size:11px;color:var(--gold);background:none;border:none;cursor:pointer;padding:0">↺ Reset</button>
+        <div class="card-title" style="margin-bottom:0" id="lbl-reg-first">📋 First-Time Registration</div>
+        <button onclick="resetRegCosts('first')" style="font-size:11px;color:var(--gold);background:none;border:none;cursor:pointer;padding:0" id="lbl-reset-first">↺ Reset</button>
       </div>
       <div id="reg-first-rows"></div>
     </div>
@@ -584,37 +737,68 @@ svg{display:block}
   <!-- ══ SETTINGS ══ -->
   <div class="page" id="page-settings">
     <div class="card">
-      <div class="card-title">🌗 Appearance</div>
+      <div class="card-title" id="lbl-set-appear">🌗 Appearance</div>
       <div class="setting-row">
-        <div><div class="setting-lbl">Theme</div></div>
+        <div><div class="setting-lbl" id="lbl-theme">Theme</div></div>
         <div class="theme-toggle" id="theme-toggle">
-          <div class="theme-opt active" onclick="setTheme('dark')">Dark</div>
-          <div class="theme-opt" onclick="setTheme('light')">Light</div>
+          <div class="theme-opt active" onclick="setTheme('dark')" id="theme-dark-opt">Dark</div>
+          <div class="theme-opt" onclick="setTheme('light')" id="theme-light-opt">Light</div>
+        </div>
+      </div>
+      <div class="setting-row" style="margin-top:4px">
+        <div><div class="setting-lbl" id="lbl-lang">Language</div></div>
+        <div class="theme-toggle" id="lang-toggle">
+          <div class="theme-opt active" onclick="setLang('en')" id="lang-en-opt">EN</div>
+          <div class="theme-opt" onclick="setLang('ar')" id="lang-ar-opt">ع</div>
         </div>
       </div>
     </div>
     <div class="card">
-      <div class="card-title">💰 Finances</div>
+      <div class="setting-row" style="border-bottom:none;padding:0">
+        <div><div class="setting-lbl" id="lbl-set-currency-card">💱 Currency</div></div>
+        <select id="currency-select" onchange="setCurrencyFromSelect(this)"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;font-size:14px;color:var(--text);outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;min-width:160px;text-align:right">
+          <option value="AED|AED" id="copt-AED">🇦🇪 AED – Dirham</option>
+          <option value="SAR|SAR" id="copt-SAR">🇸🇦 SAR – Riyal</option>
+          <option value="KWD|KWD" id="copt-KWD">🇰🇼 KWD – Dinar</option>
+          <option value="QAR|QAR" id="copt-QAR">🇶🇦 QAR – Riyal</option>
+          <option value="BHD|BHD" id="copt-BHD">🇧🇭 BHD – Dinar</option>
+          <option value="OMR|OMR" id="copt-OMR">🇴🇲 OMR – Rial</option>
+          <option value="USD|$"   id="copt-USD">🇺🇸 USD – Dollar</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" id="lbl-set-finances">💰 Finances</div>
       <div class="setting-row">
-        <div><div class="setting-lbl">Monthly Salary</div><div class="setting-sub">AED</div></div>
+        <div><div class="setting-lbl" id="lbl-s-salary">Monthly Salary</div><div class="setting-sub" id="lbl-s-salary-sub">AED</div></div>
         <div class="setting-val"><input type="number" id="s-salary"/></div>
       </div>
       <div class="setting-row">
-        <div><div class="setting-lbl">Savings Target</div><div class="setting-sub">%</div></div>
+        <div><div class="setting-lbl" id="lbl-s-save">Savings Target</div><div class="setting-sub">%</div></div>
         <div class="setting-val"><input type="number" id="s-save-pct"/></div>
       </div>
       <div class="setting-row">
-        <div><div class="setting-lbl">Fuel Budget</div><div class="setting-sub">AED / month</div></div>
+        <div><div class="setting-lbl" id="lbl-s-fuel-bgt">Fuel Budget</div><div class="setting-sub" id="lbl-s-fuel-bgt-sub">AED / month</div></div>
         <div class="setting-val"><input type="number" id="s-fuel-bgt"/></div>
       </div>
     </div>
 
-    <button class="save-settings-btn" onclick="saveSettings()">Save Settings</button>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0" id="lbl-nav-picker">📌 Bottom Navigation</div>
+        <span style="font-size:11px;color:var(--text-dim)" id="nav-pick-count">3 / 4</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px" id="lbl-nav-picker-sub">Dashboard is always included. Pick up to 3 more.</div>
+      <div id="nav-page-picker"></div>
+      <button id="nav-save-btn" class="btn-p" onclick="saveNavChanges()" style="display:none;margin-top:12px">Save Changes</button>
+    </div>
+    <button class="save-settings-btn" id="btn-save-settings" onclick="saveSettings()">Save Settings</button>
     <div class="card" style="margin-top:12px">
-      <div class="card-title">💾 Data Backup</div>
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;line-height:1.6">Export all your data as a JSON file. Import it on a new device or after clearing browser storage.</div>
-      <button class="btn-export" onclick="exportData()">⬇️ Export All Data</button>
-      <label class="btn-export" for="import-file" style="margin-top:8px;cursor:pointer">⬆️ Import Data</label>
+      <div class="card-title" id="lbl-data-backup">💾 Data Backup</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;line-height:1.6" id="lbl-backup-desc">Export all your data as a JSON file. Import it on a new device or after clearing browser storage.</div>
+      <button class="btn-export" id="btn-export-data" onclick="exportData()">⬇️ Export All Data</button>
+      <label class="btn-export" for="import-file" style="margin-top:8px;cursor:pointer" id="lbl-import-data">⬆️ Import Data</label>
       <input type="file" id="import-file" accept=".json" onchange="importData(event)"/>
     </div>
     <div style="height:10px"></div>
@@ -681,21 +865,8 @@ svg{display:block}
   </div>
 </div><!-- end content -->
 
-<!-- BOTTOM NAV -->
-<nav id="nav">
-  <button class="nav-btn active" onclick="switchPage('dashboard')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    Dashboard<div class="nav-dot"></div>
-  </button>
-  <button class="nav-btn" onclick="switchPage('fuel')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 22V8a2 2 0 012-2h6a2 2 0 012 2v14"/><path d="M13 12h3a2 2 0 012 2v4a1 1 0 001 1h0a1 1 0 001-1V9l-3-3"/><path d="M3 22h10"/><line x1="5" y1="11" x2="11" y2="11"/></svg>
-    Fuel<div class="nav-dot"></div>
-  </button>
-  <button class="nav-btn" onclick="switchPage('budget')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/></svg>
-    Budget<div class="nav-dot"></div>
-  </button>
-</nav>
+<!-- BOTTOM NAV — rendered dynamically by renderNav() -->
+<nav id="nav"></nav>
 </div><!-- end app -->
 
 <!-- BURGER DRAWER -->
@@ -703,12 +874,12 @@ svg{display:block}
   <div id="menu-backdrop"></div>
   <div id="menu-drawer">
     <div id="menu-top">
-      <div class="ml">MY<em>.</em>TRACKER</div>
-      <div class="ms">Personal Dashboard</div>
+      <div class="ml" id="menu-app-name">دفتر <em style="font-style:normal;font-size:14px;font-weight:400;letter-spacing:2px">DAFTAR</em></div>
+      <div class="ms" id="menu-app-sub">دفترك الشخصي · Your Personal Tracker</div>
     </div>
     <div id="menu-list">
       <div class="msec">Main</div>
-      <div class="mi active" id="mi-dashboard" onclick="menuNav('dashboard')"><div class="ic">📊</div><div class="inf"><div class="mn">Dashboard</div><div class="md">Overview & fuel gauge</div></div></div>
+      <div class="mi active" id="mi-dashboard" onclick="menuNav('dashboard')"><div class="ic">📊</div><div class="inf"><div class="mn">Dashboard</div><div class="md">Finance &amp; car tracker</div></div></div>
       <div class="mi" id="mi-fuel" onclick="menuNav('fuel')"><div class="ic">⛽</div><div class="inf"><div class="mn">Fuel Log</div><div class="md">Fill-ups & trends</div></div></div>
       <div class="mi" id="mi-budget" onclick="menuNav('budget')"><div class="ic">💰</div><div class="inf"><div class="mn">Budget</div><div class="md">Salary & spending</div></div></div>
       <div class="msec">Car</div>
@@ -718,7 +889,7 @@ svg{display:block}
       <div class="mi" id="mi-loan" onclick="menuNav('loan')"><div class="ic">🚘</div><div class="inf"><div class="mn">Loan Calculator</div><div class="md">Car finance & registration</div></div></div>
       <div class="mi" id="mi-trip" onclick="menuNav('trip')"><div class="ic">🗺️</div><div class="inf"><div class="mn">Trip Calculator</div><div class="md">Distance · fuel · salik cost</div></div></div>
       <div class="msec">Other</div>
-      <div class="mi" id="mi-settings" onclick="menuNav('settings')"><div class="ic">⚙️</div><div class="inf"><div class="mn">Settings</div><div class="md">Salary, cleaning, theme</div></div></div>
+      <div class="mi" id="mi-settings" onclick="menuNav('settings')"><div class="ic">⚙️</div><div class="inf"><div class="mn">Settings</div></div></div>
     </div>
   </div>
 </div>
@@ -1016,13 +1187,13 @@ const PC_SPECS=[
   {cat:"Monitor",name:"MSI Pro MP251 25\" IPS FHD 100 Hz"},
 ];
 const SVC_INTERVALS=[
-  {task:"Oil & Filter Change",every:"10,000 km",next:110000},
-  {task:"Cabin Air Filter",every:"30,000 km",next:110000},
-  {task:"Drive Belts & Hoses",every:"30,000 km",next:110000},
-  {task:"Brake Fluid + Spark Plugs",every:"60,000 km",next:150000},
-  {task:"Fuel System + Diff Fluid",every:"60,000 km",next:150000},
-  {task:"Transmission + Coolant Flush",every:"60,000 km",next:210000},
-  {task:"Air Intake Filters",every:"60,000 km",next:270000},
+  {task:"Oil & Filter Change",         every:"10,000 km", interval:10000},
+  {task:"Cabin Air Filter",            every:"30,000 km", interval:30000},
+  {task:"Drive Belts & Hoses",         every:"30,000 km", interval:30000},
+  {task:"Brake Fluid + Spark Plugs",   every:"60,000 km", interval:60000},
+  {task:"Fuel System + Diff Fluid",    every:"60,000 km", interval:60000},
+  {task:"Transmission + Coolant Flush",every:"60,000 km", interval:60000},
+  {task:"Air Intake Filters",          every:"60,000 km", interval:60000},
 ];
 
 
@@ -1060,6 +1231,611 @@ function stationLogo(name) {
 // ═══════════════════════════════════════
 function ls(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
 function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+let currentPage='dashboard';
+let fuelFilter=null;
+let fuelYearFilter=null;
+
+
+// ═══════════════════════════════════════
+//  DYNAMIC NAV
+// ═══════════════════════════════════════
+const ALL_PAGES = [
+  { id:'dashboard', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>', labelKey:'dashboard' },
+  { id:'fuel',        icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 22V8a2 2 0 012-2h6a2 2 0 012 2v14"/><path d="M13 12h3a2 2 0 012 2v4a1 1 0 001 1h0a1 1 0 001-1V9l-3-3"/><path d="M3 22h10"/><line x1="5" y1="11" x2="11" y2="11"/></svg>', labelKey:'fuel' },
+  { id:'budget',      icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/></svg>', labelKey:'budget' },
+  { id:'cleaning',    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M5 12c0 4 3 7 7 7s7-3 7-7"/><path d="M8 12V8c0-2.2 1.8-4 4-4s4 1.8 4 4v4"/><circle cx="8.5" cy="5.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="3.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="5.5" r="1" fill="currentColor" stroke="none"/></svg>', labelKey:'mi_cleaning' },
+  { id:'maintenance', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>', labelKey:'mi_maintenance' },
+  { id:'checklist',   icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>', labelKey:'mi_checklist' },
+  { id:'loan',        icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>', labelKey:'mi_loan' },
+  { id:'trip',        icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>', labelKey:'mi_trip' },
+];
+
+// navPages: always starts with dashboard, then user choices (max 3 more)
+let navPages = ls('nav_pages', ['dashboard','fuel','budget']);
+// Ensure dashboard is always first and present
+if (!navPages.includes('dashboard')) navPages.unshift('dashboard');
+navPages = ['dashboard', ...navPages.filter(p=>p!=='dashboard')].slice(0,4);
+
+// Draft — changes here, committed on Save
+let _navDraft = [...navPages];
+
+function saveNavPages() { navPages = [..._navDraft]; ss('nav_pages', navPages); }
+
+function renderNav() {
+  const nav = document.getElementById('nav');
+  if (!nav) return;
+  nav.innerHTML = navPages.map(pid => {
+    const page = ALL_PAGES.find(p=>p.id===pid);
+    if (!page) return '';
+    const shortKeys = {dashboard:'dashboard',fuel:'fuel',budget:'budget'};
+    const labelKey = shortKeys[pid] || page.labelKey;
+    const fullLabel = t(labelKey);
+    const shortLabel = fullLabel.length > 10 ? fullLabel.substring(0,9)+'…' : fullLabel;
+    const isActive = currentPage === pid;
+    return `<button class="nav-btn${isActive?' active':''}" onclick="switchPage('${pid}')" style="${isActive?'color:var(--gold)':''}">
+      ${page.icon}
+      <span class="nav-lbl">${shortLabel}</span><div class="nav-dot"></div>
+    </button>`;
+  }).join('');
+}
+
+// ── Drag-to-reorder state ──
+let _dragSrc = null;
+
+function renderNavSettings() {
+  const container = document.getElementById('nav-page-picker');
+  if (!container) return;
+  const choices = ALL_PAGES.filter(p=>p.id!=='dashboard');
+  const selected = _navDraft.filter(p=>p!=='dashboard');
+
+  // Section 1: Selected pages (draggable to reorder)
+  const selectedHTML = selected.length ? `
+    <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text-mute);padding:0 0 8px;text-transform:uppercase">${t('nav_order_lbl')||'In nav bar'}</div>
+    <div id="nav-order-list">
+      ${selected.map(pid => {
+        const page = ALL_PAGES.find(p=>p.id===pid);
+        if (!page) return '';
+        return `<div class="nav-pick-item selected nav-drag-item" draggable="true"
+            data-pid="${pid}"
+            ondragstart="navDragStart(event,'${pid}')"
+            ondragover="navDragOver(event)"
+            ondrop="navDrop(event,'${pid}')"
+            ondragend="navDragEnd(event)">
+          <div style="color:var(--text-mute);font-size:16px;cursor:grab;padding-right:4px">⠿</div>
+          <div class="nav-pick-icon">${page.icon}</div>
+          <span class="nav-pick-lbl">${t(page.labelKey)}</span>
+          <div class="nav-pick-check" onclick="toggleNavPage('${pid}')" style="cursor:pointer" title="Remove">✓</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="height:1px;background:var(--border);margin:10px 0"></div>` : '';
+
+  // Section 2: Available pages to add
+  const available = choices.filter(p=>!selected.includes(p.id));
+  const atMax = selected.length >= 3;
+  const availableHTML = available.length ? `
+    <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text-mute);padding:0 0 8px;text-transform:uppercase">${t('nav_add_lbl')||'Add to nav'}</div>
+    ${available.map(page => `
+      <div class="nav-pick-item${atMax?' disabled':''}" onclick="${atMax?'':'toggleNavPage(\''+page.id+'\')'}">
+        <div class="nav-pick-icon">${page.icon}</div>
+        <span class="nav-pick-lbl">${t(page.labelKey)}</span>
+        <div class="nav-pick-check" style="border-style:dashed;color:var(--text-mute)">+</div>
+      </div>`).join('')}` : '';
+
+  container.innerHTML = selectedHTML + availableHTML;
+
+  const ctr = document.getElementById('nav-pick-count');
+  if (ctr) ctr.textContent = (selected.length+1)+' / 4';
+
+  // Show/hide save button
+  const changed = JSON.stringify(_navDraft) !== JSON.stringify(navPages);
+  const saveBtn = document.getElementById('nav-save-btn');
+  if (saveBtn) { saveBtn.style.display = changed ? 'block' : 'none'; }
+}
+
+// Drag handlers
+function navDragStart(e, pid) {
+  _dragSrc = pid;
+  e.dataTransfer.effectAllowed = 'move';
+  e.currentTarget.style.opacity = '0.4';
+}
+function navDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+function navDrop(e, targetPid) {
+  e.preventDefault();
+  if (!_dragSrc || _dragSrc === targetPid) return;
+  const nonDash = _navDraft.filter(p=>p!=='dashboard');
+  const fromIdx = nonDash.indexOf(_dragSrc);
+  const toIdx   = nonDash.indexOf(targetPid);
+  if (fromIdx < 0 || toIdx < 0) return;
+  nonDash.splice(fromIdx, 1);
+  nonDash.splice(toIdx, 0, _dragSrc);
+  _navDraft = ['dashboard', ...nonDash];
+  renderNavSettings();
+}
+function navDragEnd(e) {
+  _dragSrc = null;
+  e.currentTarget.style.opacity = '';
+}
+
+function toggleNavPage(pid) {
+  const idx = _navDraft.indexOf(pid);
+  if (idx > -1) {
+    _navDraft.splice(idx, 1);
+  } else {
+    if (_navDraft.length < 4) {
+      _navDraft.push(pid);
+    }
+  }
+  renderNavSettings(); // preview only — don't save or update real nav yet
+}
+
+function saveNavChanges() {
+  saveNavPages();
+  renderNav();
+  renderNavSettings();
+  showToast(t('saved'));
+}
+
+// ═══════════════════════════════════════
+//  INTERNATIONALISATION (EN / AR)
+// ═══════════════════════════════════════
+
+const T = {
+  en: {
+    // Nav
+    dashboard:'Dashboard', fuel:'Fuel', budget:'Budget',
+    // Menu sections
+    main:'Main', car:'Car', other:'Other',
+    // Menu items
+    mi_dashboard:'Dashboard', mi_dashboard_sub:'Finance & car tracker',
+    mi_fuel:'Fuel Log', mi_fuel_sub:'Fill-ups & trends',
+    mi_budget:'Budget', mi_budget_sub:'Salary & spending',
+    mi_cleaning:'Car Cleaning', mi_cleaning_sub:'Subscription tracker',
+    mi_maintenance:'Maintenance', mi_maintenance_sub:'Service history & intervals',
+    mi_checklist:'Checklist', mi_checklist_sub:'Fixes & mods wishlist',
+    mi_loan:'Loan Calculator', mi_loan_sub:'Car finance & registration',
+    mi_trip:'Trip Calculator', mi_trip_sub:'Distance · fuel · salik cost',
+    mi_settings:'Settings', mi_settings_sub:'',
+    // Page titles
+    page_dashboard:'Dashboard', page_fuel:'Fuel Log', page_budget:'Budget',
+    page_cleaning:'Car Cleaning', page_maintenance:'Maintenance',
+    page_checklist:'Checklist', page_loan:'Loan Calculator',
+    page_trip:'Trip Calculator', page_settings:'Settings',
+    // Dashboard
+    fuel_this_month:'⛽ Fuel This Month', savings_health:'💰 Savings Health',
+    monthly_chart:'📈 Monthly Fuel Spend', recent_fillups:'Recent Fill-ups',
+    see_all:'See all →', of_target:'of 20% target',
+    aed_this_month:'this month', fillups:'Fill-ups', remaining:'Remaining', budget:'Budget',
+    below_target:'below target', target_met:'✓ Target met!',
+    salary:'Salary', monthly_spend:'Monthly Spend', actual_saving:'Actual Saving',
+    // Fuel
+    this_year:'This Year', avg_month:'Avg/Month', fill_count:'Fill-ups',
+    all_years:'All Years', all:'All', no_entries:'No entries',
+    log_fillup:'Log Fill-up ⛽', date:'Date', type:'Type', station:'Station',
+    amount_aed:'Amount', note_opt:'Note (optional)', save_fillup:'Save Fill-up',
+    edit_fillup:'Edit Fill-up ⛽', save_changes:'Save Changes', delete_entry:'Delete Entry',
+    super98:'Super', special95:'Special', eplus:'E-Plus',
+    adnoc:'Adnoc', enoc:'Enoc', eppco:'Eppco', emarat:'Emarat', other:'Other',
+    oneway:'One Way', roundtrip:'Round Trip (×2)',
+    // Budget
+    monthly_snapshot:'📊 Monthly Snapshot', spending_breakdown:'🧾 Spending Breakdown',
+    car_cost_detail:'🚗 Car Expenses Detail',
+    m_salary:'Monthly Salary', total_spending:'Total Spending',
+    savings_target:'Savings Target', actual_saving2:'Actual Saving',
+    total_car:'Total Car', maintenance_yr:'Maintenance', yr_avg:'yr avg',
+    car_loan:'Car Loan', petrol:'Petrol', car_wash:'Car Wash', salik:'Salik', per_mo:'/mo',
+    fuel_avg:'fuel avg', auto:'auto', cat_name:'Category name', add:'Add',
+    // Cleaning
+    done:'Done', sessions:'Sessions', cost:'Cost',
+    cleaning_grid:'🧼 Cleaning Grid – Tap to Mark',
+    sub_info:'📋 Subscription Info',
+    price_per_sess:'Price per session', monthly_cost:'Monthly Cost',
+    sessions_mo:'Sessions / Month', start_date:'Start Date',
+    reset_sessions:'🔄 Reset All Sessions',
+    session_date_title:'Session Date Done', mark_done:'Mark Done', cancel:'Cancel',
+    reset_confirm:'Reset all sessions to unchecked? This cannot be undone.',
+    // Maintenance
+    avg_yr_spend:'Avg/Year Spend', next_service:'Next Service', total_spent:'Total Spent',
+    intervals_title:'📅 Next Service Intervals', history_title:'🔧 Service History',
+    all_years2:'All Years', service_name:'Service name', km:'KM', from:'From',
+    done_badge:'Done', due_soon:'Due soon', at_km:'At',
+    current_km:'Current Mileage', save_km:'Save KM',
+    // Checklist
+    issues_title:'🔨 Issues / Fixes', mods_title:'✨ Mods Wishlist',
+    new_issue:'New issue…', new_mod:'New mod…', prio:'Priority',
+    // Loan
+    loan_title:'🚘 Car Loan Calculator', car_price:'Car Price',
+    down_pct:'Down Payment %', years:'Years', interest_rate:'Bank Interest % /year',
+    dp:'Down Payment', after_dp:'Amount After Down Payment', term:'Loan Term',
+    total_interest:'Total Bank Interest', total_finance:'Total to Finance',
+    ppm:'Monthly Payment', monthly_pmt:'Monthly Payment', total_repay:'Total Repayment', total_loan_amt:'Total Loan Amount', yrs_unit:'yrs', reg_renewal:'📋 Annual Renewal Costs',
+    reg_first:'📋 First-Time Registration', reset_defaults:'↺ Reset',
+    // Trip
+    trip_title:'🗺️ Trip Cost Calculator', loading_prices:'Loading prices…',
+    refresh:'↺ Refresh', distance:'Distance (KM)', fuel_type:'Fuel Type',
+    fuel_cons:'Fuel Consumption', salik_tolls:'Salik / Tolls',
+    round_trip:'Round Trip?', quick_presets:'💡 Quick Presets',
+    recent_trips:'🕐 Recent Trips', return_trip:'return',
+    commute1:'🏙️ Commute', commute1_sub:'60km · No Salik', commute1_sub2:'6.5 km/L · One way',
+    commute2:'🛣️ Commute', commute2_sub:'40km · 2× Salik', commute2_sub2:'8 km/L · One way',
+    sport:'🏎️ Sport Drive', sport_sub:'80km · No Salik', sport_sub2:'5 km/L · Push it',
+    abudhabi:'🌴 Dubai→Abu Dhabi', abudhabi_sub:'120km · Round trip', abudhabi_sub2:'7 km/L · Super 98',
+    dist_km:'Distance', fuel_needed:'Fuel needed', fuel_cost:'Fuel cost',
+    salik_cost:'Salik / tolls', cost_per_km:'Cost per KM', total_trip:'Total Trip Cost', litres:'litres',
+    // Settings
+    settings_title:'Settings', appearance:'🌗 Appearance', theme:'Theme',
+    dark:'Dark', light:'Light', language:'Language',
+    currency_card:'💱 Currency', finances:'💰 Finances',
+    s_salary:'Monthly Salary', s_save_pct:'Savings Target', s_fuel_bgt:'Fuel Budget',
+    per_month:'/month',
+    nav_picker:'📌 Bottom Navigation', nav_picker_sub:'Dashboard is always pinned. Pick up to 3 more.', nav_order_lbl:'In nav bar', nav_add_lbl:'Add to nav',
+    curr_AED:'Dirham', curr_SAR:'Riyal', curr_KWD:'Dinar',
+    curr_QAR:'Riyal', curr_BHD:'Dinar', curr_OMR:'Rial', curr_USD:'Dollar', save_settings:'Save Settings', data_backup:'💾 Data Backup',
+    backup_desc:'Export all your data as a JSON file. Import it on a new device or after clearing browser storage.',
+    export_btn:'⬇️ Export All Data', import_btn:'⬆️ Import Data',
+    saved:'Settings saved ✓', updated:'Updated ✓', added:'Added ✓', removed:'Removed',
+    restored:'Restored ✓', marked_done:'Marked done ✓', unmarked:'Unmarked',
+    fill_valid:'Enter a valid amount', fill_name:'Fill in name and amount',
+    invalid_file:'Invalid backup file', import_ok:'Import successful ✓',
+    import_fail:'Failed to read file', reset_ok:'Sessions reset',
+    export_ok:'Exported ✓', km_saved:'KM saved ✓', cleaning_saved:'Cleaning settings saved ✓',
+    delete_confirm:'Delete this entry?', delete_entry_btn:'Delete',
+    edit:'Edit', issues_fixes:'Issues / Fixes', mods_wishlist:'Mods Wishlist',
+    progress_done:'done', empty_fuel:'No entries', empty_svc:'No records for this year',
+    just_now:'just now', ago:'ago',
+  },
+  ar: {
+    // Nav
+    dashboard:'الرئيسية', fuel:'الوقود', budget:'الميزانية',
+    // Menu
+    main:'رئيسي', car:'السيارة', other:'أخرى',
+    mi_dashboard:'الرئيسية', mi_dashboard_sub:'ماليات · سيارة · وقود',
+    mi_fuel:'سجل الوقود', mi_fuel_sub:'التعبئات والاتجاهات',
+    mi_budget:'الميزانية', mi_budget_sub:'الراتب والمصروفات',
+    mi_cleaning:'غسيل السيارة', mi_cleaning_sub:'متابعة الاشتراك',
+    mi_maintenance:'الصيانة', mi_maintenance_sub:'سجل الصيانة والمواعيد',
+    mi_checklist:'قائمة المهام', mi_checklist_sub:'الإصلاحات وقائمة التعديلات',
+    mi_loan:'حساب تمويل السيارة', mi_loan_sub:'التمويل والتسجيل',
+    mi_trip:'حاسبة الرحلة', mi_trip_sub:'المسافة · الوقود · السالك',
+    mi_settings:'الإعدادات', mi_settings_sub:'',
+    // Page titles
+    page_dashboard:'الرئيسية', page_fuel:'سجل الوقود', page_budget:'الميزانية',
+    page_cleaning:'غسيل السيارة', page_maintenance:'الصيانة',
+    page_checklist:'قائمة المهام', page_loan:'حساب تمويل السيارة',
+    page_trip:'حاسبة الرحلة', page_settings:'الإعدادات',
+    // Dashboard
+    fuel_this_month:'⛽ وقود هذا الشهر', savings_health:'💰 صحة المدخرات',
+    monthly_chart:'📈 مصاريف الوقود الشهرية', recent_fillups:'آخر التعبئات',
+    see_all:'عرض الكل ←', of_target:'من هدف ٢٠٪',
+    aed_this_month:'هذا الشهر', fillups:'تعبئة', remaining:'المتبقي', budget:'الميزانية',
+    below_target:'أقل من الهدف', target_met:'✓ تم تحقيق الهدف!',
+    salary:'الراتب', monthly_spend:'المصاريف الشهرية', actual_saving:'المدخرات الفعلية',
+    // Fuel
+    this_year:'هذا العام', avg_month:'متوسط/شهر', fill_count:'تعبئة',
+    all_years:'كل السنوات', all:'الكل', no_entries:'لا يوجد سجلات',
+    log_fillup:'تسجيل تعبئة ⛽', date:'التاريخ', type:'النوع', station:'المحطة',
+    amount_aed:'المبلغ', note_opt:'ملاحظة (اختياري)', save_fillup:'حفظ التعبئة',
+    edit_fillup:'تعديل التعبئة ⛽', save_changes:'حفظ التغييرات', delete_entry:'حذف',
+    super98:'سوبر', special95:'ممتاز', eplus:'إي بلاس',
+    adnoc:'أدنوك', enoc:'إينوك', eppco:'إيبكو', emarat:'إمارات', other:'أخرى',
+    oneway:'اتجاه واحد', roundtrip:'ذهاب وعودة (×٢)',
+    // Budget
+    monthly_snapshot:'📊 ملخص شهري', spending_breakdown:'🧾 تفصيل المصاريف',
+    car_cost_detail:'🚗 تفاصيل مصاريف السيارة',
+    m_salary:'الراتب الشهري', total_spending:'إجمالي المصاريف',
+    savings_target:'هدف الادخار', actual_saving2:'المدخرات الفعلية',
+    total_car:'إجمالي السيارة', maintenance_yr:'الصيانة', yr_avg:'متوسط سنوي',
+    car_loan:'قرض السيارة', petrol:'البنزين', car_wash:'غسيل السيارة', salik:'سالك', per_mo:'/شهر',
+    fuel_avg:'متوسط وقود', auto:'تلقائي', cat_name:'اسم التصنيف', add:'إضافة',
+    // Cleaning
+    done:'منجز', sessions:'جلسات', cost:'التكلفة',
+    cleaning_grid:'🧼 جدول الغسيل – اضغط للتأشير',
+    sub_info:'📋 معلومات الاشتراك',
+    price_per_sess:'سعر الجلسة', monthly_cost:'التكلفة الشهرية',
+    sessions_mo:'الجلسات / شهر', start_date:'تاريخ البدء',
+    reset_sessions:'🔄 إعادة تعيين الجلسات',
+    session_date_title:'تاريخ إنجاز الجلسة', mark_done:'تأشير منجز', cancel:'إلغاء',
+    reset_confirm:'إعادة تعيين جميع الجلسات؟ لا يمكن التراجع عن هذا.',
+    // Maintenance
+    avg_yr_spend:'متوسط الإنفاق/سنة', next_service:'الصيانة القادمة', total_spent:'الإجمالي المنفق',
+    intervals_title:'📅 مواعيد الصيانة القادمة', history_title:'🔧 سجل الصيانة',
+    all_years2:'كل السنوات', service_name:'اسم الخدمة', km:'الكيلومتر', from:'من',
+    done_badge:'منجز', due_soon:'مستحقة قريباً', at_km:'عند',
+    current_km:'الكيلومتر الحالي', save_km:'حفظ',
+    // Checklist
+    issues_title:'🔨 المشاكل والإصلاحات', mods_title:'✨ قائمة التعديلات',
+    new_issue:'مشكلة جديدة…', new_mod:'تعديل جديد…', prio:'الأولوية',
+    // Loan
+    loan_title:'🚘 حاسبة قرض السيارة', car_price:'سعر السيارة',
+    down_pct:'نسبة الدفعة الأولى ٪', years:'السنوات', interest_rate:'نسبة فائدة البنك ٪/سنة',
+    dp:'الدفعة الأولى', after_dp:'المبلغ بعد الدفعة الأولى', term:'مدة القرض',
+    total_interest:'إجمالي فوائد البنك', total_finance:'إجمالي التمويل',
+    ppm:'الدفعة الشهرية', monthly_pmt:'الدفعة الشهرية', total_repay:'إجمالي السداد', total_loan_amt:'إجمالي مبلغ القرض', yrs_unit:'سنة', reg_renewal:'📋 تكاليف التجديد السنوي',
+    reg_first:'📋 التسجيل لأول مرة', reset_defaults:'↺ إعادة تعيين',
+    // Trip
+    trip_title:'🗺️ حاسبة تكلفة الرحلة', loading_prices:'جاري التحميل…',
+    refresh:'↺ تحديث', distance:'المسافة (كم)', fuel_type:'نوع الوقود',
+    fuel_cons:'استهلاك الوقود', salik_tolls:'السالك / الرسوم',
+    round_trip:'نوع الرحلة', quick_presets:'💡 وجهات سريعة',
+    recent_trips:'🕐 آخر الرحلات', return_trip:'ذهاب وعودة',
+    commute1:'🏙️ تنقل', commute1_sub:'٦٠ كم · بدون سالك', commute1_sub2:'٦.٥ كم/لتر · اتجاه واحد',
+    commute2:'🛣️ تنقل', commute2_sub:'٤٠ كم · سالك ×٢', commute2_sub2:'٨ كم/لتر · اتجاه واحد',
+    sport:'🏎️ قيادة رياضية', sport_sub:'٨٠ كم · بدون سالك', sport_sub2:'٥ كم/لتر · اضغط عليها',
+    abudhabi:'🌴 دبي ← أبوظبي', abudhabi_sub:'١٢٠ كم · ذهاب وعودة', abudhabi_sub2:'٧ كم/لتر · سوبر ٩٨',
+    dist_km:'المسافة', fuel_needed:'الوقود اللازم', fuel_cost:'تكلفة الوقود',
+    salik_cost:'السالك / الرسوم', cost_per_km:'التكلفة/كم', total_trip:'إجمالي تكلفة الرحلة', litres:'لتر',
+    // Settings
+    settings_title:'الإعدادات', appearance:'🌗 المظهر', theme:'المظهر',
+    dark:'داكن', light:'فاتح', language:'اللغة',
+    currency_card:'💱 العملة', finances:'💰 الماليات',
+    s_salary:'الراتب الشهري', s_save_pct:'هدف الادخار', s_fuel_bgt:'ميزانية الوقود',
+    per_month:'/شهر',
+    nav_picker:'📌 شريط التنقل السفلي', nav_picker_sub:'الرئيسية دائمًا مثبتة. اختر حتى ٣ صفحات أخرى.', nav_order_lbl:'في شريط التنقل', nav_add_lbl:'إضافة للشريط',
+    curr_AED:'درهم', curr_SAR:'ريال', curr_KWD:'دينار',
+    curr_QAR:'ريال', curr_BHD:'دينار', curr_OMR:'ريال', curr_USD:'دولار', save_settings:'حفظ الإعدادات', data_backup:'💾 النسخ الاحتياطي',
+    backup_desc:'صدّر بياناتك كملف JSON. استورده على جهاز جديد أو بعد مسح بيانات المتصفح.',
+    export_btn:'⬇️ تصدير البيانات', import_btn:'⬆️ استيراد البيانات',
+    saved:'تم حفظ الإعدادات ✓', updated:'تم التحديث ✓', added:'تمت الإضافة ✓', removed:'تم الحذف',
+    restored:'تم الاسترجاع ✓', marked_done:'تم التأشير ✓', unmarked:'تم الإلغاء',
+    fill_valid:'أدخل مبلغاً صحيحاً', fill_name:'أدخل الاسم والمبلغ',
+    invalid_file:'ملف النسخة الاحتياطية غير صالح', import_ok:'تم الاستيراد بنجاح ✓',
+    import_fail:'فشل قراءة الملف', reset_ok:'تمت إعادة تعيين الجلسات',
+    export_ok:'تم التصدير ✓', km_saved:'تم حفظ الكيلومتر ✓', cleaning_saved:'تم حفظ إعدادات الغسيل ✓',
+    delete_confirm:'حذف هذا السجل؟', delete_entry_btn:'حذف',
+    edit:'تعديل', issues_fixes:'المشاكل والإصلاحات', mods_wishlist:'قائمة التعديلات',
+    progress_done:'منجز', empty_fuel:'لا يوجد سجلات', empty_svc:'لا يوجد سجلات لهذا العام',
+    just_now:'الآن', ago:'مضت',
+  }
+};
+
+let currentLang = ls('lang','en');
+let currentCurrency = ls('currency',{code:'AED',sym:'AED'});
+
+function t(key) {
+  const val = (T[currentLang]||T.en)[key];
+  if (val !== undefined) return val;          // even if empty string — intentional
+  return T.en[key] !== undefined ? T.en[key] : key;  // EN fallback, then key
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  ss('lang', lang);
+  // RTL / LTR
+  document.documentElement.setAttribute('dir', lang==='ar' ? 'rtl' : 'ltr');
+  document.documentElement.setAttribute('lang', lang);
+  // Update toggle active state
+  document.getElementById('lang-en-opt').classList.toggle('active', lang==='en');
+  document.getElementById('lang-ar-opt').classList.toggle('active', lang==='ar');
+  // Re-render current page + always refresh dashboard
+  applyTranslations();
+  renderDashboard();
+  // Re-render all pages that have translated content
+  renderBudget();
+  renderFuel();
+  renderCleaning();
+  renderMaintenance();
+  renderRequirements();
+  if (currentPage === 'settings') renderSettings();
+  // Refresh page title
+  const ptEl=document.getElementById('page-title');
+  if(ptEl) ptEl.textContent=getPageTitle(currentPage);
+}
+
+function setCurrencyFromSelect(sel) {
+  const [code, sym] = sel.value.split('|');
+  currentCurrency = { code, sym };
+  ss('currency', currentCurrency);
+  renderDashboard();
+  renderBudget();
+  if (currentPage === 'fuel')        renderFuel();
+  if (currentPage === 'cleaning')    renderCleaning();
+  if (currentPage === 'maintenance') renderMaintenance();
+  applyTranslations();
+  showToast(code + ' ✓');
+}
+// Keep setCurrency as alias for import compatibility
+function setCurrency(btn) {
+  if (btn && btn.dataset) {
+    currentCurrency = { code: btn.dataset.code, sym: btn.dataset.sym };
+    ss('currency', currentCurrency);
+    const sel = document.getElementById('currency-select');
+    if (sel) sel.value = btn.dataset.code + '|' + btn.dataset.sym;
+    renderDashboard(); renderBudget(); applyTranslations();
+  }
+}
+
+function curr() { return currentCurrency.sym; }
+
+
+
+function applyTranslations() {
+  // Static labels mapped by element id → translation key
+  const map = {
+    // Nav buttons — text nodes are trickier, handled in nav rendering
+    'lbl-set-appear':     'appearance',
+    'lbl-theme':          'theme',
+    'lbl-lang':           'language',
+    'theme-dark-opt':     'dark',
+    'theme-light-opt':    'light',
+    'lbl-set-currency-card': 'currency_card',
+    'lbl-set-finances':   'finances',
+    'lbl-s-salary':       's_salary',
+    'lbl-s-save':         's_save_pct',
+    'lbl-s-fuel-bgt':     's_fuel_bgt',
+    'lbl-cl-price-sess':  'price_per_sess',
+    'lbl-cl-monthly':     'monthly_cost',
+    'lbl-cl-sessions':    'sessions_mo',
+    'lbl-cl-start':       'start_date',
+    'cl-sub-title':       'sub_info',
+    'btn-reset-sessions': 'reset_sessions',
+  };
+  Object.entries(map).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = t(key);
+  });
+
+  // Currency sub-labels
+  const salSub = document.getElementById('lbl-s-salary-sub');
+  if (salSub) salSub.textContent = curr();
+  const fuelSub = document.getElementById('lbl-s-fuel-bgt-sub');
+  if (fuelSub) fuelSub.textContent = curr() + ' ' + t('per_month');
+  const clCurr = document.getElementById('cl-currency-lbl');
+  if (clCurr) clCurr.textContent = curr();
+
+  // Nav — re-render dynamically
+  renderNav();
+
+  // Menu items
+  const miMap = [
+    ['mi-dashboard','mi_dashboard','mi_dashboard_sub'],
+    ['mi-fuel','mi_fuel','mi_fuel_sub'],
+    ['mi-budget','mi_budget','mi_budget_sub'],
+    ['mi-cleaning','mi_cleaning','mi_cleaning_sub'],
+    ['mi-maintenance','mi_maintenance','mi_maintenance_sub'],
+    ['mi-checklist','mi_checklist','mi_checklist_sub'],
+    ['mi-loan','mi_loan','mi_loan_sub'],
+    ['mi-trip','mi_trip','mi_trip_sub'],
+    // mi-settings has no subtitle — handled separately below
+  ];
+  miMap.forEach(([id, nk, sk]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const mn = el.querySelector('.mn'); if(mn) mn.textContent = t(nk);
+    const md = el.querySelector('.md'); if(md) { const txt=t(sk); md.textContent=txt; md.style.display=txt?'':'none'; }
+  });
+  // Settings name only (no subtitle)
+  const miSettings = document.getElementById('mi-settings');
+  if (miSettings) { const mn=miSettings.querySelector('.mn'); if(mn) mn.textContent=t('mi_settings'); }
+
+  // Menu section labels
+  document.querySelectorAll('.msec').forEach((el, i) => {
+    const keys = ['main','car','other'];
+    if (keys[i]) el.textContent = t(keys[i]);
+  });
+
+  // Font family for Arabic
+  const isAr = currentLang === 'ar';
+  document.body.style.fontFamily = isAr
+    ? "'Geeza Pro','Arabic UI Text','Noto Naskh Arabic','Segoe UI',sans-serif"
+    : "-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif";
+
+  const bss=document.getElementById('btn-save-settings');if(bss)bss.textContent=t('save_settings');
+  const ldb=document.getElementById('lbl-data-backup');if(ldb)ldb.textContent=t('data_backup');
+  const lbd=document.getElementById('lbl-backup-desc');if(lbd)lbd.textContent=t('backup_desc');
+  const bed=document.getElementById('btn-export-data');if(bed)bed.textContent=t('export_btn');
+  const lid=document.getElementById('lbl-import-data');if(lid)lid.textContent=t('import_btn');
+
+  // Dashboard / budget / cleaning card titles
+  const cardMap = {
+    'card-fuel-month':       ['card-title', 'fuel_this_month'],
+    'card-savings-health':   ['card-title', 'savings_health'],
+    'card-monthly-chart':    ['card-title', 'monthly_chart'],
+    'card-monthly-snapshot': ['card-title', 'monthly_snapshot'],
+    'card-spending-breakdown':['card-title','spending_breakdown'],
+    'card-car-cost-detail':  ['card-title', 'car_cost_detail'],
+    'card-cleaning-grid':    ['card-title', 'cleaning_grid'],
+    'lbl-monthly-spend':     ['text', 'monthly_spend'],
+    'lbl-actual-saving':     ['text', 'actual_saving'],
+  };
+  Object.entries(cardMap).forEach(([id, [, key]]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = t(key);
+  });
+
+  // Additional static labels
+  const extraMap = {
+    'lbl-recent-fills':  'recent_fillups',
+    'lbl-see-all':       'see_all',
+    'd-salary-lbl':      'salary',
+    'lbl-monthly-spend': 'monthly_spend',
+    'lbl-actual-saving': 'actual_saving',
+    'saving-target-lbl': 'of_target',
+    'card-fuel-month':   'fuel_this_month',
+    'card-savings-health':'savings_health',
+    'card-monthly-chart':'monthly_chart',
+    'card-monthly-snapshot':'monthly_snapshot',
+    'card-spending-breakdown':'spending_breakdown',
+    'card-car-cost-detail':'car_cost_detail',
+    'card-cleaning-grid':'cleaning_grid',
+    'lbl-cl-done':       'done',
+    'lbl-cl-cost-stat':  'cost',
+    'lbl-cl-price-sess': 'price_per_sess',
+    'lbl-cl-monthly':    'monthly_cost',
+    'lbl-cl-sessions':   'sessions_mo',
+    'lbl-cl-start':      'start_date',
+    'cl-sub-title':      'sub_info',
+    'btn-reset-sessions':'reset_sessions',
+  };
+  Object.entries(extraMap).forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=t(key);
+  });
+
+  // Loan calc labels
+  const lmpEl=document.getElementById('lbl-monthly-pmt'); if(lmpEl) lmpEl.textContent=t('monthly_pmt');
+  const ltlEl=document.getElementById('lbl-total-loan');  if(ltlEl) ltlEl.textContent=t('total_loan_amt');
+  const ltiEl=document.getElementById('lbl-total-interest-lbl'); if(ltiEl) ltiEl.textContent=t('total_interest');
+  const ltrEl=document.getElementById('lbl-total-repay'); if(ltrEl) ltrEl.textContent=t('total_repay');
+  const lyrEl=document.getElementById('lbl-lc-yrs-unit'); if(lyrEl) lyrEl.textContent=t('yrs_unit');
+  const lcpEl=document.getElementById('lbl-lc-price'); if(lcpEl) lcpEl.textContent=t('car_price');
+  const lcdEl=document.getElementById('lbl-lc-dp'); if(lcdEl) lcdEl.textContent=t('down_pct').replace(' %','');
+  const lcrEl=document.getElementById('lbl-lc-rate'); if(lcrEl) lcrEl.textContent=t('interest_rate');
+  const lcyEl=document.getElementById('lbl-lc-years'); if(lcyEl) lcyEl.textContent=t('years');
+
+  // Page title
+  const ptEl=document.getElementById('page-title');
+  if(ptEl) ptEl.textContent=getPageTitle(currentPage);
+
+  // Re-render cleaning cost with curr()
+  const clCost=document.getElementById('cl-cost');
+  // (done in renderCleaning — just update currency label)
+  const clCurrLbl2=document.getElementById('cl-currency-lbl');
+  if(clCurrLbl2) clCurrLbl2.textContent=curr();
+
+  // Re-render savings gap if visible
+  const sgEl=document.getElementById('saving-gap');
+  // Will be refreshed on next renderDashboard call
+
+
+
+  // Budget add row
+  const bnn=document.getElementById('bgt-new-name'); if(bnn) bnn.placeholder=t('cat_name');
+  const bna=document.getElementById('bgt-new-amt'); if(bna) bna.placeholder=curr()+'/mo';
+  const bab=document.getElementById('btn-add-budget-item'); if(bab) bab.textContent=t('add');
+  // Nav picker labels
+  const lnp=document.getElementById('lbl-nav-picker'); if(lnp) lnp.textContent=t('nav_picker');
+  const lnps=document.getElementById('lbl-nav-picker-sub'); if(lnps) lnps.textContent=t('nav_picker_sub');
+  renderNavSettings();
+
+  // Menu header — language-specific
+  const menuName = document.getElementById('menu-app-name');
+  const menuSub  = document.getElementById('menu-app-sub');
+  if (currentLang === 'ar') {
+    if (menuName) menuName.innerHTML = 'دفتر';
+    if (menuSub)  menuSub.textContent = 'دفترك الشخصي';
+  } else {
+    if (menuName) menuName.innerHTML = 'DAFTAR';
+    if (menuSub)  menuSub.textContent = 'Your Personal Tracker';
+  }
+
+  // Sync currency dropdown value + translate options
+  const currSel = document.getElementById('currency-select');
+  if (currSel) {
+    // Update option labels per language
+    const opts = [
+      ['AED','AED','curr_AED'],['SAR','SAR','curr_SAR'],['KWD','KWD','curr_KWD'],
+      ['QAR','QAR','curr_QAR'],['BHD','BHD','curr_BHD'],['OMR','OMR','curr_OMR'],
+      ['USD','$','curr_USD'],
+    ];
+    const flags = {'AED':'🇦🇪','SAR':'🇸🇦','KWD':'🇰🇼','QAR':'🇶🇦','BHD':'🇧🇭','OMR':'🇴🇲','USD':'🇺🇸'};
+    opts.forEach(([code, sym, tkey]) => {
+      const opt = document.getElementById('copt-'+code);
+      if (opt) opt.textContent = flags[code] + ' ' + code + ' – ' + t(tkey);
+    });
+    currSel.value = currentCurrency.code + '|' + currentCurrency.sym;
+  }
+}
 
 let settings=ls('settings',{...DEFAULTS});
 let fuelData=ls('fuel',null)||[...SEED_FUEL];
@@ -1101,25 +1877,25 @@ function setTheme(t){
   });
 }
 function applyTheme(){
-  document.documentElement.setAttribute('data-theme',settings.theme||'dark');
-  document.querySelectorAll('.theme-opt').forEach(el=>{
-    el.classList.toggle('active',el.textContent.toLowerCase()===(settings.theme||'dark'));
-  });
+  document.documentElement.setAttribute('data-theme', settings.theme||'dark');
+  const darkOpt  = document.getElementById('theme-dark-opt');
+  const lightOpt = document.getElementById('theme-light-opt');
+  if (darkOpt)  darkOpt.classList.toggle('active',  (settings.theme||'dark')==='dark');
+  if (lightOpt) lightOpt.classList.toggle('active', (settings.theme||'dark')==='light');
 }
 
 // ═══════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════
-const PAGE_TITLES={dashboard:'Dashboard',fuel:'Fuel Log',budget:'Budget',cleaning:'Car Cleaning',maintenance:'Maintenance',checklist:'Checklist',loan:'Loan Calculator',trip:'Trip Calculator',settings:'Settings'};
-let currentPage='dashboard';
-let fuelFilter=null;
-let fuelYearFilter=null;
+function getPageTitle(p){const m={dashboard:'page_dashboard',fuel:'page_fuel',budget:'page_budget',cleaning:'page_cleaning',maintenance:'page_maintenance',checklist:'page_checklist',loan:'page_loan',trip:'page_trip',settings:'page_settings'};return t(m[p]||p)||p;}
+// navigation state — declared at top of script
 
 function switchPage(p){
   currentPage=p;
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
-  document.getElementById('page-title').textContent=PAGE_TITLES[p]||p;
+  document.getElementById('page-title').textContent=getPageTitle(p);
+  renderNav();
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   const ni=['dashboard','fuel','budget'].indexOf(p);
   if(ni>=0)document.querySelectorAll('.nav-btn')[ni].classList.add('active');
@@ -1206,10 +1982,10 @@ function saveEditedFuelEntry(i) {
   const station= document.getElementById('f-sta').value;
   const amount = parseFloat(document.getElementById('f-amt').value);
   const note   = document.getElementById('f-note').value.trim();
-  if (!date || isNaN(amount) || amount <= 0) { showToast('Enter a valid amount'); return; }
+  if (!date || isNaN(amount) || amount <= 0) { showToast(t('fill_valid')); return; }
   fuelData[i] = {date, type, station, amount, ...(note?{note}:{})};
   fuelData.sort((a,b)=>a.date.localeCompare(b.date));
-  saveFuel(); closeModal(); showToast('Updated ✓');
+  saveFuel(); closeModal(); showToast(t('updated'));
   renderDashboard(); if(currentPage==='fuel') renderFuel();
 }
 
@@ -1232,10 +2008,10 @@ function saveFuelEntry(){
   const station=document.getElementById('f-sta').value;
   const amount=parseFloat(document.getElementById('f-amt').value);
   const note=document.getElementById('f-note').value.trim();
-  if(!date||isNaN(amount)||amount<=0){showToast('Enter a valid amount');return;}
+  if(!date||isNaN(amount)||amount<=0){showToast(t('fill_valid'));return;}
   fuelData.push({date,type,station,amount,...(note?{note}:{})});
   fuelData.sort((a,b)=>a.date.localeCompare(b.date));
-  saveFuel();closeModal();showToast('Fill-up saved ✓');
+  saveFuel();closeModal();showToast(t('saved'));
   renderDashboard();if(currentPage==='fuel')renderFuel();
 }
 
@@ -1272,7 +2048,7 @@ function doUndo() {
   t.classList.remove('show');
   if (fn) {
     fn();
-    setTimeout(() => showToast('Restored ✓'), 80);
+    setTimeout(() => showToast(t('restored')), 80);
   }
 }
 
@@ -1302,11 +2078,15 @@ function renderDashboard(){
     if(pct>=1)fill.classList.add('danger');else if(pct>=.75)fill.classList.add('warn');
   }));
   document.getElementById('gauge-val').textContent=fmtN(spent);
+  const guText=document.getElementById('gauge-unit-text');if(guText)guText.textContent=curr()+' '+t('aed_this_month');
+  const stLbl=document.getElementById('saving-target-lbl');if(stLbl)stLbl.textContent=t('of_target').replace('20',settings.savePct||20);
+  const rrLbl=document.getElementById('lbl-recent-fills');if(rrLbl)rrLbl.textContent=t('recent_fillups');
+  const saLbl=document.getElementById('lbl-see-all');if(saLbl)saLbl.textContent=t('see_all');
   const rem=Math.max(0,bgt-spent);
   document.getElementById('gauge-meta').innerHTML=`
     <div class="gm-item"><div class="gv">${mf.length}</div><div class="gl">Fill-ups</div></div>
-    <div class="gm-item"><div class="gv" style="color:${rem>0?'var(--gold)':'var(--red)'}">${rem>0?fmtN(rem):'Over!'}</div><div class="gl">Remaining</div></div>
-    <div class="gm-item"><div class="gv">${fmtN(bgt)}</div><div class="gl">Budget</div></div>`;
+    <div class="gm-item"><div class="gv" style="color:${rem>0?'var(--gold)':'var(--red)'}">${rem>0?fmtN(rem):'Over!'}</div><div class="gl">${t('remaining')}</div></div>
+    <div class="gm-item"><div class="gv">${fmtN(bgt)}</div><div class="gl">${t('budget')}</div></div>`;
   // Stats — sync Car Expenses from live data before summing
   const sal=settings.salary||8700;
   const _petrolAvg = calcPetrolAvg();
@@ -1344,8 +2124,8 @@ function renderDashboard(){
   document.getElementById('saving-pct').textContent = (pctDisplay > 0 ? pctDisplay : 0) + '%';
   const gap = tgt - act;
   document.getElementById('saving-gap').textContent = gap > 0
-    ? `AED ${fmtN(gap)} below target`
-    : '✓ Target met!';
+    ? `${curr()} ${fmtN(gap)} ${t('below_target')}`
+    : t('target_met');
   // Chart
   const bkts={};fuelData.forEach(f=>{const k=getMK(f.date);bkts[k]=(bkts[k]||0)+f.amount;});
   const mos=Object.keys(bkts).sort().slice(-6);
@@ -1355,7 +2135,8 @@ function renderDashboard(){
     return`<div class="bc${k===mk?' cur':''}"><div class="al">${fmt(a)}</div><div class="b" style="height:${h}px"></div><div class="ml">${MONTHS[parseInt(mo)-1]}</div></div>`;
   }).join('');
   // Recent
-  document.getElementById('recent-fills').innerHTML=[...fuelData].reverse().slice(0,5).map(renderFuelItem).join('')||'<div class="empty"><div class="empty-icon">⛽</div>No fill-ups yet</div>';
+  const recentSlice = [...fuelData].reverse().slice(0,5);
+  document.getElementById('recent-fills').innerHTML = recentSlice.map(f => renderFuelItem(f, fuelData.indexOf(f))).join('') || '<div class="empty"><div class="empty-icon">⛽</div>No fill-ups yet</div>';
 }
 
 // ═══════════════════════════════════════
@@ -1365,29 +2146,39 @@ function pillStyle(active){
   return `flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid ${active?'var(--gold)':'var(--border)'};color:${active?'var(--gold)':'var(--text-dim)'};background:${active?'var(--gold-glow)':'var(--surface2)'};white-space:nowrap;cursor:pointer`;
 }
 function renderFuel(){
-  // Determine active year for stats
-  const activeYr = fuelYearFilter || new Date().getFullYear().toString();
-  const yd = fuelData.filter(f => getYK(f.date) === activeYr);
-  const yt = yd.reduce((s,f)=>s+f.amount,0);
-  const bm = {}; yd.forEach(f=>{const k=getMK(f.date);bm[k]=(bm[k]||0)+f.amount;});
+  if (!fuelYearFilter) fuelYearFilter = new Date().getFullYear().toString();
+
+  // Stats — respect BOTH year AND month filter
+  let statData = fuelData.filter(f => getYK(f.date) === fuelYearFilter);
+  if (fuelFilter) statData = statData.filter(f => getMK(f.date) === fuelFilter);
+
+  const yt = statData.reduce((s,f)=>s+f.amount,0);
+  const bm = {}; statData.forEach(f=>{const k=getMK(f.date);bm[k]=(bm[k]||0)+f.amount;});
   const mc = Object.keys(bm).length||1;
-  document.getElementById('f-yr').textContent = 'AED '+fmtN(yt);
-  document.getElementById('f-avg').textContent = 'AED '+fmtN(yt/mc);
-  document.getElementById('f-cnt').textContent = yd.length;
+  document.getElementById('f-yr').textContent  = curr()+' '+fmtN(yt);
+  document.getElementById('f-avg').textContent = curr()+' '+fmtN(yt/mc);
+  document.getElementById('f-cnt').textContent = statData.length;
+  const lfy=document.getElementById('lbl-f-yr');
+  if(lfy) lfy.textContent = fuelFilter
+    ? MONTHS[parseInt(fuelFilter.split('-')[1])-1]
+    : fuelYearFilter;
+  const lfa=document.getElementById('lbl-f-avg');if(lfa)lfa.textContent=t('avg_month');
+  const lfc=document.getElementById('lbl-f-cnt');if(lfc)lfc.textContent=t('fill_count');
 
   // Year pills
-  const allYears = [...new Set(fuelData.map(f=>getYK(f.date)))].sort().reverse();
-  document.getElementById('year-pills').innerHTML =
-    `<div onclick="setFY(null)" style="${pillStyle(fuelYearFilter===null)}">All Years</div>` +
-    allYears.map(y=>`<div onclick="setFY('${y}')" style="${pillStyle(fuelYearFilter===y)}">${y}</div>`).join('');
+  const allYears=[...new Set(fuelData.map(f=>getYK(f.date)))].sort().reverse();
+  const yearPills=document.getElementById('year-pills');
+  if(yearPills) yearPills.innerHTML=allYears.map(y=>
+    `<div onclick="setFY('${y}')" style="${pillStyle(fuelYearFilter===y)}">${y}</div>`
+  ).join('');
 
-  // Month pills — scoped to active year if set
-  const srcData = fuelYearFilter ? fuelData.filter(f=>getYK(f.date)===fuelYearFilter) : fuelData;
-  const ams = [...new Set(srcData.map(f=>getMK(f.date)))].sort().reverse();
-  document.getElementById('month-pills').innerHTML =
-    `<div onclick="setFF(null)" style="${pillStyle(fuelFilter===null)}">All</div>` +
-    ams.map(k=>{const[yr2,mo]=k.split('-');
-      return`<div onclick="setFF('${k}')" style="${pillStyle(fuelFilter===k)}">${MONTHS[parseInt(mo)-1]} ${yr2}</div>`;
+  // Month pills — scoped to selected year
+  const srcData=fuelData.filter(f=>getYK(f.date)===fuelYearFilter);
+  const ams=[...new Set(srcData.map(f=>getMK(f.date)))].sort().reverse();
+  document.getElementById('month-pills').innerHTML=
+    `<div onclick="setFF(null)" style="${pillStyle(fuelFilter===null)}">${t('all')}</div>`+
+    ams.map(k=>{const[,mo]=k.split('-');
+      return`<div onclick="setFF('${k}')" style="${pillStyle(fuelFilter===k)}">${MONTHS[parseInt(mo)-1]}</div>`;
     }).join('');
 
   renderFuelList();
@@ -1398,21 +2189,40 @@ function renderFuelList(){
   let d=[...fuelData].reverse();
   if(fuelYearFilter) d=d.filter(f=>getYK(f.date)===fuelYearFilter);
   if(fuelFilter) d=d.filter(f=>getMK(f.date)===fuelFilter);
-  document.getElementById('fuel-log-list').innerHTML=d.length?d.map((f,i)=>renderFuelItem(f,fuelData.indexOf(f))).join(''):'<div class="empty"><div class="empty-icon">⛽</div>No entries</div>';
+  document.getElementById('fuel-log-list').innerHTML=d.length
+    ? d.map((f,listIdx)=>{
+        const realIdx = fuelData.indexOf(f);
+        // Days since previous fill-up (next in reversed list = older)
+        const prevF = d[listIdx+1];
+        let daysSince = null;
+        if (prevF) {
+          const diff = new Date(f.date) - new Date(prevF.date);
+          daysSince = Math.round(diff / 86400000);
+        }
+        return renderFuelItem(f, realIdx, daysSince);
+      }).join('')
+    : '<div class="empty"><div class="empty-icon">⛽</div>'+t('no_entries')+'</div>';
 }
-function renderFuelItem(f, idx){
+function renderFuelItem(f, idx, daysSince){
   const ds=new Date(f.date).toLocaleDateString('en-AE',{day:'numeric',month:'short'});
   const editBtn = (idx !== undefined)
     ? `<button class="edit-btn" onclick="event.stopPropagation();editFuelEntry(${idx})" title="Edit"><svg class="pen-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`
+    : '';
+  const daysBadge = (daysSince !== null && daysSince !== undefined)
+    ? `<span style="font-size:10px;color:var(--text-mute);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1px 7px">${daysSince}d gap</span>`
     : '';
   return`<div class="log-item">
     <div class="log-item-inner">
       <div class="log-icon" style="background:none;border:none;width:34px;height:34px;flex-shrink:0">${stationLogo(f.station)}</div>
       <div class="log-info">
-        <div class="log-top"><span class="log-st">${f.station}</span><span class="log-amt">AED ${f.amount.toFixed(2)}</span>${editBtn}</div>
+        <div class="log-top">
+          <span class="log-st">${f.station}</span>
+          <span class="log-amt">${curr()} ${f.amount.toFixed(2)}${editBtn}</span>
+        </div>
         <div class="log-tags">
           <span class="tag">${ds}</span><span class="tag">${f.type}</span>
           ${f.note?`<span class="tag amber">${f.note}</span>`:''}
+          ${daysBadge}
         </div>
       </div>
     </div>
@@ -1474,11 +2284,11 @@ function renderBudget(){
 
   // ── Snapshot ──
   document.getElementById('bgt-snap').innerHTML=`
-    <div class="li-row"><span class="li-name">Monthly Salary</span><span class="li-val" style="color:var(--gold)">AED ${fmtN(sal)}</span></div>
-    <div class="li-row"><span class="li-name">Total Spending</span><span class="li-val" style="color:${tot>sal?'var(--red)':''}">AED ${fmtN(tot)}</span></div>
-    <div class="li-row"><span class="li-name">Savings Target (${settings.savePct||20}%)</span><span class="li-val">AED ${fmtN(tgt)}</span></div>
-    <div class="li-row"><span class="li-name" style="font-weight:700">Actual Saving</span>
-      <span class="li-val" style="font-weight:700;color:${act>=tgt?'var(--green)':act>0?'var(--amber)':'var(--red)'}">AED ${fmtN(act)}</span></div>`;
+    <div class="li-row"><span class="li-name">${t('m_salary')}</span><span class="li-val" style="color:var(--gold)">${curr()} ${fmtN(sal)}</span></div>
+    <div class="li-row"><span class="li-name">${t('total_spending')}</span><span class="li-val" style="color:${tot>sal?'var(--red)':''}">${curr()} ${fmtN(tot)}</span></div>
+    <div class="li-row"><span class="li-name">${t('savings_target')} (${settings.savePct||20}%)</span><span class="li-val">${curr()} ${fmtN(tgt)}</span></div>
+    <div class="li-row"><span class="li-name" style="font-weight:700">${t('actual_saving2')}</span>
+      <span class="li-val" style="font-weight:700;color:${act>=tgt?'var(--green)':act>0?'var(--amber)':'var(--red)'}">${curr()} ${fmtN(act)}</span></div>`;
 
   // ── Spending breakdown — sorted high→low, Car Expenses locked ──
   document.getElementById('bgt-break').innerHTML=[...spendData]
@@ -1489,7 +2299,7 @@ function renderBudget(){
       const p = (item.monthly / sal * 100);
       const c = p > 40 ? 'rd' : p > 20 ? 'am' : 'ac';
       const lockBadge = isCarExp
-        ? `<span style="font-size:10px;color:var(--text-mute);margin-left:5px;background:var(--surface3);padding:1px 6px;border-radius:10px">auto</span>`
+        ? `<span style="font-size:10px;color:var(--text-mute);margin-left:5px;background:var(--surface3);padding:1px 6px;border-radius:10px">${t('auto')}</span>`
         : '';
       const editBtn = isCarExp
         ? '' // locked — no edit
@@ -1497,7 +2307,7 @@ function renderBudget(){
       return`<div class="pb-wrap">
         <div class="pb-hd">
           <span class="pb-lbl">${item.name}${lockBadge}</span>
-          <span class="pb-val">AED ${fmtN(item.monthly)} (${p.toFixed(0)}%)${editBtn}</span>
+          <span class="pb-val">${curr()} ${fmtN(item.monthly)} (${p.toFixed(0)}%)${editBtn}</span>
         </div>
         <div class="pb-track"><div class="pb-fill ${c}" style="width:${Math.min(p,100)}%"></div></div>
       </div>`;
@@ -1507,27 +2317,30 @@ function renderBudget(){
   document.getElementById('car-break').innerHTML = carData.map((item,i)=>{
     const isSalik  = item.name.toLowerCase().includes('salik');
     const isPetrol = item.name.toLowerCase().includes('petrol');
+    const isLoan   = item.name.toLowerCase().includes('loan');
+    const isWash   = item.name.toLowerCase().includes('wash');
+    const dispName = isLoan ? t('car_loan') : isPetrol ? t('petrol') : isSalik ? t('salik') : isWash ? t('car_wash') : item.name;
     const displayVal = isPetrol ? petrolAvg : item.monthly;
     const badge = isPetrol
-      ? `<span style="font-size:10px;color:var(--text-mute);margin-left:4px">(fuel avg)</span>`
-      : (!isSalik ? `<span style="font-size:10px;color:var(--text-mute);margin-left:4px">auto</span>` : '');
+      ? `<span style="font-size:10px;color:var(--text-mute);margin-left:4px">(${t('fuel_avg')})</span>`
+      : (!isSalik ? `<span style="font-size:10px;color:var(--text-mute);margin-left:4px">${t('auto')}</span>` : '');
     const editBtn = isSalik
       ? `<button class="edit-btn" onclick="editSalik(${i})" style="margin-left:6px"><svg class="pen-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`
       : '';
     return`<div class="li-row">
-      <span class="li-name">${item.name}${badge}</span>
-      <span class="li-val" style="${isSalik?'':'color:var(--text-dim)'}">AED ${fmtN(displayVal)}/mo${editBtn}</span>
+      <span class="li-name">${dispName}${badge}</span>
+      <span class="li-val" style="${isSalik?'':'color:var(--text-dim)'}">${curr()} ${fmtN(displayVal)}${t('per_mo')}${editBtn}</span>
     </div>`;
   }).join('') +
   // 2. Maintenance/service avg row
   `<div class="li-row">
-    <span class="li-name">Maintenance <span style="font-size:10px;color:var(--text-mute)">(yr avg)</span></span>
-    <span class="li-val" style="color:var(--text-dim)">AED ${fmtN(svcAvgMo)}/mo</span>
+    <span class="li-name">${t('maintenance_yr')} <span style="font-size:10px;color:var(--text-mute)">(${t('yr_avg')})</span></span>
+    <span class="li-val" style="color:var(--text-dim)">${curr()} ${fmtN(svcAvgMo)}${t('per_mo')}</span>
   </div>` +
   // Total
   `<div class="li-row" style="margin-top:4px">
-    <span class="li-name" style="font-weight:700">Total Car</span>
-    <span class="li-val" style="font-weight:700;color:var(--amber)">AED ${fmtN(carTotal)}/mo</span>
+    <span class="li-name" style="font-weight:700">${t('total_car')}</span>
+    <span class="li-val" style="font-weight:700;color:var(--amber)">${curr()} ${fmtN(carTotal)}${t('per_mo')}</span>
   </div>`;
 
   // Always keep dashboard in sync when budget changes
@@ -1536,39 +2349,68 @@ function renderBudget(){
 function addBudgetItem(){
   const n=document.getElementById('bgt-new-name').value.trim();
   const m=parseFloat(document.getElementById('bgt-new-amt').value);
-  if(!n||isNaN(m)||m<=0){showToast('Fill in name and amount');return;}
+  if(!n||isNaN(m)||m<=0){showToast(t('fill_name'));return;}
   spendData.push({name:n,monthly:m});saveSpend();
   document.getElementById('bgt-new-name').value='';document.getElementById('bgt-new-amt').value='';
-  renderBudget();showToast('Added ✓');
+  renderBudget();showToast(t('added'));
 }
 function removeBudgetItem(i){const removed=spendData.splice(i,1)[0];saveSpend();renderBudget();showUndoToast('Removed '+removed.name,()=>{spendData.splice(i,0,removed);saveSpend();renderBudget();});}
 function removeCarItem(i){const removed=carData.splice(i,1)[0];saveCar();renderBudget();showUndoToast('Removed '+removed.name,()=>{carData.splice(i,0,removed);saveCar();renderBudget();});}
+
+
+function editCleanSetting(field) {
+  const labels = { price: t('monthly_cost'), sessions: t('sessions_mo'), start: t('start_date') };
+  const types  = { price:'number', sessions:'number', start:'date' };
+  const vals   = {
+    price:    settings.cleanPrice || 94.5,
+    sessions: settings.cleanSess  || 15,
+    start:    settings.cleanStart || '2026-06-19',
+  };
+  openEditModal(labels[field], [
+    { label: labels[field], key: field, type: types[field], value: vals[field] }
+  ], result => {
+    if (field === 'price')    { settings.cleanPrice = parseFloat(result[field])||94.5; }
+    if (field === 'sessions') {
+      const newSess = parseInt(result[field])||15;
+      if (newSess !== settings.cleanSess) {
+        const old = cleanData.sessions;
+        cleanData.sessions = Array(newSess).fill(false).map((_,i)=>i<old.length?old[i]:false);
+        saveClean();
+      }
+      settings.cleanSess = newSess;
+    }
+    if (field === 'start')    { settings.cleanStart = result[field]; }
+    saveSettings2();
+    renderCleaning();
+    showToast(t('cleaning_saved'));
+  });
+}
 
 // ═══════════════════════════════════════
 //  CLEANING PAGE
 // ═══════════════════════════════════════
 function renderCleaning(){
-  // Populate settings fields
-  const cs = document.getElementById('s-clean-start');
-  const css = document.getElementById('s-clean-sess');
-  const csp = document.getElementById('s-clean-price');
-  if(cs) cs.value = settings.cleanStart||'2026-06-19';
-  if(css) css.value = settings.cleanSess||15;
-  if(csp) csp.value = settings.cleanPrice||94.5;
+  // Populate display spans
   const done=cleanData.sessions.filter(Boolean).length;
   const total=cleanData.sessions.length;
   const pp=settings.cleanPrice||94.5;
   const perSess=pp/total;
-  document.getElementById('cl-done').textContent=done;
+  document.getElementById('cl-done-combined').textContent = done + ' / ' + total;
+  const lbcd=document.getElementById('lbl-cl-done');
+  if(lbcd) lbcd.textContent = t('done');
+  const lbcc=document.getElementById('lbl-cl-cost-stat');if(lbcc)lbcc.textContent=t('cost');
   // Update sessions label to show last clean date
   const lastDone=[...cleanData.sessions].reverse().find(v=>typeof v==='string');
-  document.getElementById('cl-total').textContent=total;
-  document.getElementById('cl-cost').textContent='AED '+(done*perSess).toFixed(2);
-  document.getElementById('cl-price-disp').textContent='AED '+perSess.toFixed(2);
-  document.getElementById('cl-sub-disp').textContent='AED '+pp.toFixed(2);
-  document.getElementById('cl-sess-disp').textContent=total;
+  document.getElementById('cl-cost').textContent=curr()+' '+(done*perSess).toFixed(2);
+  document.getElementById('cl-price-disp').textContent=curr()+' '+perSess.toFixed(2);
   const sd=settings.cleanStart||'2026-06-19';
-  document.getElementById('cl-start-disp').textContent=new Date(sd).toLocaleDateString('en-AE',{day:'numeric',month:'short',year:'numeric'});
+  // Populate display spans (pen-to-edit pattern)
+  const subVal=document.getElementById('cl-sub-val');
+  if(subVal) subVal.textContent=curr()+' '+(settings.cleanPrice||94.5).toFixed(2);
+  const sessVal=document.getElementById('cl-sess-val');
+  if(sessVal) sessVal.textContent=settings.cleanSess||15;
+  const startVal=document.getElementById('cl-start-val');
+  if(startVal) startVal.textContent=new Date(sd).toLocaleDateString('en-AE',{day:'numeric',month:'short',year:'numeric'});
   const start=new Date(sd);
   document.getElementById('clean-grid').innerHTML=cleanData.sessions.map((val,i)=>{
     const isDone = !!val;
@@ -1587,7 +2429,7 @@ function toggleClean(i){
   if (cur) {
     // Already done → uncheck
     cleanData.sessions[i] = false;
-    saveClean(); renderCleaning(); showToast('Unmarked');
+    saveClean(); renderCleaning(); showToast(t('unmarked'));
   } else {
     // Not done → ask for date
     openCleanDatePicker(i);
@@ -1613,9 +2455,87 @@ function confirmCleanDate(i) {
 }
 
 function resetCleanSessions() {
-  if (!confirm('Reset all sessions to unchecked? This cannot be undone.')) return;
+  document.getElementById('modal-title').textContent = t('reset_sessions');
+  document.getElementById('modal-body').innerHTML =
+    `<p style="color:var(--text-dim);font-size:14px;margin-bottom:20px">${t('reset_confirm')}</p>
+     <button class="btn-del" onclick="doResetClean()">🔄 ${t('reset_sessions')}</button>
+     <button class="btn-sec" onclick="closeModal()" style="margin-top:8px;width:100%;padding:13px;border-radius:var(--r-sm)">Cancel</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function doResetClean() {
   cleanData.sessions = Array(cleanData.sessions.length).fill(false);
-  saveClean(); renderCleaning(); showToast('Sessions reset');
+  saveClean();
+  closeModal();
+  renderCleaning();
+  showToast(t('reset_ok'));
+}
+
+
+// ═══════════════════════════════════════
+//  RECEIPT IMAGE
+// ═══════════════════════════════════════
+let _pendingReceipt = null; // base64 string
+
+function previewReceipt() {
+  const file = document.getElementById('svc-receipt').files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const rawData = e.target.result;
+    // Try canvas resize — fall back to raw dataURL if blocked
+    try {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const maxW = 800, maxH = 800;
+          let w = img.width, h = img.height;
+          if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+          if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          _pendingReceipt = canvas.toDataURL('image/jpeg', 0.75);
+        } catch(canvasErr) {
+          // Canvas blocked (e.g. security policy) — use raw
+          _pendingReceipt = rawData;
+        }
+        showReceiptAttached();
+      };
+      img.onerror = () => { _pendingReceipt = rawData; showReceiptAttached(); };
+      img.src = rawData;
+    } catch(e) {
+      _pendingReceipt = rawData;
+      showReceiptAttached();
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function showReceiptAttached() {
+  const prev = document.getElementById('svc-receipt-preview');
+  const clr  = document.getElementById('svc-receipt-clear');
+  if (prev) prev.style.display = 'inline';
+  if (clr)  clr.style.display  = 'inline';
+}
+
+function clearReceipt() {
+  _pendingReceipt = null;
+  const inp  = document.getElementById('svc-receipt');
+  const prev = document.getElementById('svc-receipt-preview');
+  const clr  = document.getElementById('svc-receipt-clear');
+  if (inp)  inp.value = '';
+  if (prev) prev.style.display = 'none';
+  if (clr)  clr.style.display  = 'none';
+}
+
+function viewReceipt(i) {
+  const s = svcData[i];
+  if (!s || !s.receipt) return;
+  document.getElementById('modal-title').textContent = s.name + ' — Receipt';
+  document.getElementById('modal-body').innerHTML =
+    '<img src="' + s.receipt + '" style="width:100%;border-radius:var(--r-sm);margin-bottom:12px"/>' +
+    '<button class="btn-sec" onclick="closeModal()">Close</button>';
+  document.getElementById('modal-overlay').classList.add('open');
 }
 
 // ═══════════════════════════════════════
@@ -1647,43 +2567,106 @@ function renderMaintenance(){
   const svcYearVals = Object.values(svcByYear);
   const svcAvgYr = svcYearVals.length ? svcYearVals.reduce((a,b)=>a+b,0)/svcYearVals.length : 0;
 
-  document.getElementById('m-km').textContent = 'AED '+fmtN(svcAvgYr);
+  document.getElementById('m-km').textContent=curr()+' '+fmtN(svcAvgYr);
+  const lmk=document.getElementById('lbl-m-km');if(lmk)lmk.textContent=t('avg_yr_spend');
+  const lmn=document.getElementById('lbl-m-next');if(lmn)lmn.textContent=t('next_service');
+  const lmt=document.getElementById('lbl-m-total');if(lmt)lmt.textContent=t('total_spent');
   document.getElementById('m-next').textContent = fmtN(nextOil)+' km';
-  document.getElementById('m-total').textContent = 'AED '+fmtN(totalCost)+(curSvcYr?' ('+curSvcYr+')':'');
+  document.getElementById('m-total').textContent = curr()+' '+fmtN(totalCost)+(curSvcYr?' ('+curSvcYr+')':'');
 
-  // Service intervals (always full list)
+  // Service intervals — compute nextAt from last-done KM in history (not just rounding)
   document.getElementById('svc-intervals').innerHTML=SVC_INTERVALS.map(iv=>{
-    const done=iv.next<=km;const due=iv.next<=km+5000&&iv.next>km;
-    const cls=done?'done':due?'due':'future';
-    const bc=done?'b-done':due?'b-due':'b-future';
-    const lbl=done?'Done':due?'Due soon':`At ${fmtN(iv.next)} km`;
+    // Match history entries: prefer exact svcType match, fall back to fuzzy name
+    const matchingEntries = svcData.filter(s => {
+      if (s.svcType) return s.svcType === iv.task;
+      // Fuzzy fallback for old entries without svcType
+      const ivWords = iv.task.toLowerCase().split(/[\s+&,]+/).filter(w=>w.length>3);
+      const sName = s.name.toLowerCase();
+      return ivWords.some(w => sName.includes(w));
+    });
+
+    let nextAt;
+    if (matchingEntries.length > 0) {
+      // Use last service entry's KM + interval
+      const lastEntry = matchingEntries.reduce((a,b) => a.km > b.km ? a : b);
+      nextAt = lastEntry.km + iv.interval;
+    } else {
+      // Never done — round up from current km
+      nextAt = Math.ceil((km + 1) / iv.interval) * iv.interval;
+    }
+
+    const overdue  = km >= nextAt;
+    const due      = !overdue && nextAt - km <= 5000;
+    const cls = overdue ? 'done' : due ? 'due' : 'future';
+    const bc  = overdue ? 'b-done': due ? 'b-due':'b-future';
+    const remaining = nextAt - km;
+    const lbl = overdue
+      ? `Overdue — was due at ${fmtN(nextAt)} km`
+      : due
+      ? `Due soon — ${fmtN(remaining)} km left`
+      : `At ${fmtN(nextAt)} km`;
     return`<div class="iv-item"><div class="iv-dot ${cls}"></div>
       <div class="iv-info"><div class="iv-task">${iv.task}</div><div class="iv-sub">Every ${iv.every}</div></div>
       <span class="iv-badge ${bc}">${lbl}</span></div>`;
   }).join('');
 
-  // Service history (filtered)
-  document.getElementById('svc-history').innerHTML=[...filteredSvc].reverse().map(s=>{
+  // Search + year filter for service history
+  const svcSearch = (document.getElementById('svc-search')?.value || '').toLowerCase().trim();
+  let displaySvc = [...filteredSvc].reverse();
+  if (svcSearch) {
+    displaySvc = displaySvc.filter(s =>
+      s.name.toLowerCase().includes(svcSearch) ||
+      (s.from && s.from.toLowerCase().includes(svcSearch)) ||
+      String(s.km).includes(svcSearch)
+    );
+  }
+
+  // Service history
+  document.getElementById('svc-history').innerHTML=displaySvc.map(s=>{
     const i=svcData.indexOf(s);
     const d=new Date(s.date).toLocaleDateString('en-AE',{day:'numeric',month:'short',year:'numeric'});
     return`<div class="svc-item">
-        <div class="svc-hd"><span class="svc-name">${s.name}</span><span class="svc-cost">AED ${fmtN(s.cost)}<button class="edit-btn" onclick="editSvcItem(${i})" style="margin-left:6px"><svg class="pen-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button></span></div>
+        <div class="svc-hd"><span class="svc-name">${s.name}</span><span class="svc-cost">${curr()} ${fmtN(s.cost)}<button class="edit-btn" onclick="editSvcItem(${i})" style="margin-left:6px"><svg class="pen-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button></span></div>
         <div class="svc-meta">
           <span class="svc-tag">${fmtN(s.km)} km</span><span class="svc-tag">${d}</span>
+          ${s.svcType && s.svcType!==s.name?`<span class="svc-tag" style="color:var(--gold);border-color:var(--gold-dim)">${s.svcType}</span>`:''}
           ${s.from?`<span class="svc-tag">${s.from}</span>`:''}
+          ${s.receipt?`<button onclick="viewReceipt(${i})" style="background:var(--teal-glow);border:1px solid var(--teal-dim);border-radius:20px;padding:2px 9px;font-size:10px;color:var(--teal);cursor:pointer;margin-left:2px">📄 Receipt</button>`:''}
         </div>
     </div>`;
-  }).join('') || '<div class="empty" style="padding:20px"><div class="empty-icon">🔧</div>No records for this year</div>';
+  }).join('') || `<div class="empty" style="padding:20px"><div class="empty-icon">🔧</div>${svcSearch ? 'No matching records' : 'No records for this year'}</div>`;
 }
+function onSvcTypeChange() {
+  const sel = document.getElementById('svc-type');
+  const nameInput = document.getElementById('svc-name');
+  if (!sel || !nameInput) return;
+  const val = sel.value;
+  if (val === '__custom__' || val === '') {
+    nameInput.value = '';
+    nameInput.focus();
+  } else {
+    nameInput.value = val;
+  }
+}
+
 function addService(){
-  const name=document.getElementById('svc-name').value.trim();
-  const km=parseFloat(document.getElementById('svc-km').value);
-  const cost=parseFloat(document.getElementById('svc-cost').value);
-  const from=document.getElementById('svc-from').value.trim();
-  if(!name||isNaN(cost)){showToast('Fill name and cost');return;}
-  svcData.push({name,km:km||settings.currentKM||0,date:todayStr(),cost,from});
-  saveSvc();['svc-name','svc-km','svc-cost','svc-from'].forEach(id=>{document.getElementById(id).value='';});
-  renderMaintenance();showToast('Service added ✓');
+  const name = document.getElementById('svc-name').value.trim();
+  const km   = parseFloat(document.getElementById('svc-km').value);
+  const cost = parseFloat(document.getElementById('svc-cost').value);
+  const from = document.getElementById('svc-from').value.trim();
+  const typeSel = document.getElementById('svc-type');
+  const svcType = (typeSel && typeSel.value && typeSel.value !== '__custom__') ? typeSel.value : null;
+  if (!name || isNaN(cost)) { showToast(t('fill_name')); return; }
+  const entry = { name, km: km||settings.currentKM||0, date: todayStr(), cost, from };
+  if (svcType)         entry.svcType = svcType;
+  if (_pendingReceipt) entry.receipt  = _pendingReceipt;
+  svcData.push(entry);
+  saveSvc();
+  ['svc-name','svc-km','svc-cost','svc-from'].forEach(id=>{document.getElementById(id).value='';});
+  if (typeSel) typeSel.value = '';
+  clearReceipt();
+  renderMaintenance();
+  showToast(t('added'));
 }
 function removeSvc(i){const removed=svcData.splice(i,1)[0];saveSvc();renderMaintenance();showUndoToast('Removed '+removed.name,()=>{svcData.splice(i,0,removed);saveSvc();renderMaintenance();});}
 
@@ -1741,7 +2724,7 @@ function renderRequirements(){
     el.id=`mod-sw-${i}`;
     el.innerHTML=`<div class="req-item" id="mod-si-${i}" style="${r.done?'opacity:0.5':''}">
         <div class="req-ck${r.done?' done':''}" onclick="toggleReq('mods',${i})"></div>
-        <span class="req-lbl${r.done?' done':''}">${r.label}${r.price?` <span class="req-price">AED ${fmtN(r.price)}</span>`:''}</span>
+        <span class="req-lbl${r.done?' done':''}">${r.label}${r.price?` <span class="req-price">${curr()} ${fmtN(r.price)}</span>`:''}</span>
         <button class="edit-btn" onclick="editReqItem('mods',${i})">${PEN_SVG}</button>
         <span class="prio ${pc}">${pl}</span>
       </div>`;
@@ -1768,12 +2751,42 @@ function addReq(list){
     modsData.push({done:false,label:lbl,prio,price});saveMods();
     document.getElementById('mod-new').value='';document.getElementById('mod-price').value='';
   }
-  renderRequirements();showToast('Added ✓');
+  renderRequirements();showToast(t('added'));
 }
 function removeReq(list,i){
   if(list==='issues'){const removed=issuesData.splice(i,1)[0];saveIssues();renderRequirements();showUndoToast('Removed: '+removed.label,()=>{issuesData.splice(i,0,removed);saveIssues();renderRequirements();});}
   else{const removed=modsData.splice(i,1)[0];saveMods();renderRequirements();showUndoToast('Removed: '+removed.label,()=>{modsData.splice(i,0,removed);saveMods();renderRequirements();});}
 }
+
+
+function fillSlider(sliderId) {
+  const sl = document.getElementById(sliderId);
+  if (!sl) return;
+  const min = parseFloat(sl.min), max = parseFloat(sl.max), val = parseFloat(sl.value);
+  const pct = ((val - min) / (max - min)) * 100;
+  sl.style.background = `linear-gradient(to right, var(--gold) ${pct}%, var(--border) ${pct}%)`;
+}
+function syncSlider(inputId, sliderId, min, max) {
+  const v = parseFloat(document.getElementById(inputId).value);
+  const sl = document.getElementById(sliderId);
+  if (sl) { sl.value = Math.max(min, Math.min(max, v)); fillSlider(sliderId); }
+}
+function syncInput(sliderId, inputId) {
+  const v = document.getElementById(sliderId).value;
+  const inp = document.getElementById(inputId);
+  if (inp) inp.value = v;
+  fillSlider(sliderId);
+}
+function setLoanYears(y) {
+  document.querySelectorAll('.lc-yr-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('lc-yr-'+y);
+  if (btn) btn.classList.add('active');
+  const disp = document.getElementById('lc-years-display');
+  if (disp) disp.textContent = y;
+  window._loanYears = y;
+  calcLoan();
+}
+window._loanYears = 5;
 
 // ═══════════════════════════════════════
 //  LOAN CALCULATOR
@@ -1781,28 +2794,39 @@ function removeReq(list,i){
 function calcLoan(){
   const price   = parseFloat(document.getElementById('lc-price').value)  || 0;
   const dpPct   = parseFloat(document.getElementById('lc-dp').value)     || 0;
-  const years   = parseFloat(document.getElementById('lc-years').value)  || 5;
-  const rateAnn = parseFloat(document.getElementById('lc-rate').value)   || 3.8427;
+  const years   = window._loanYears || 5;
+  const rateAnn = parseFloat(document.getElementById('lc-rate').value)   || 3.84;
+  const months  = years * 12;
+  const dp            = price * (dpPct / 100);
+  const financed      = price - dp;
+  const totalInterest = financed * (rateAnn / 100) * years;
+  const totalRepay    = financed + totalInterest;
+  const ppm           = totalRepay / months;
 
-  // ── Tariq's flat-rate formula ──────────────────────────────
-  const dp              = price * (dpPct / 100);
-  const financed        = price - dp;
-  const months          = years * 12;
-  const totalInterest   = financed * (rateAnn / 100) * years;   // flat annual interest
-  const totalToFinance  = financed + totalInterest;              // principal + all interest
-  const ppm             = totalToFinance / months;               // equal monthly payment
-  // ──────────────────────────────────────────────────────────
+  // Update down payment AED display
+  const dpAmt = document.getElementById('lc-dp-amt');
+  if (dpAmt) dpAmt.textContent = fmtN(dp);
+  // Currency symbols
+  const priceSym = document.getElementById('lc-price-sym');
+  const dpSym    = document.getElementById('lc-dp-sym');
+  if (priceSym) priceSym.textContent = curr();
+  if (dpSym)    dpSym.textContent    = curr();
 
-  if (!price) { document.getElementById('loan-result').innerHTML=''; return; }
+  // Summary display
+  const ppmEl      = document.getElementById('lc-ppm-display');
+  const financedEl = document.getElementById('lc-financed-display');
+  const interestEl = document.getElementById('lc-interest-display');
+  const totalEl    = document.getElementById('lc-total-display');
+  if (!price) { if(ppmEl) ppmEl.textContent='—'; return; }
+  if(ppmEl)      ppmEl.textContent      = curr()+' '+fmtN(Math.round(ppm));
+  if(financedEl) financedEl.textContent = curr()+' '+fmtN(financed);
+  if(interestEl) interestEl.textContent = curr()+' '+fmtN(totalInterest);
+  if(totalEl)    totalEl.textContent    = curr()+' '+fmtN(totalRepay);
 
-  document.getElementById('loan-result').innerHTML=`
-    <div class="lr-row"><span>Car Price</span><span>AED ${fmtN(price)}</span></div>
-    <div class="lr-row"><span>Down Payment (${dpPct}%)</span><span>AED ${fmtN(dp)}</span></div>
-    <div class="lr-row"><span>Amount After Down Payment</span><span>AED ${fmtN(financed)}</span></div>
-    <div class="lr-row"><span>Loan Term</span><span>${years} yrs (${months} months)</span></div>
-    <div class="lr-row"><span>Total Bank Interest (${rateAnn}% × ${years}yr)</span><span>AED ${fmtN(totalInterest)}</span></div>
-    <div class="lr-row"><span>Total to Finance</span><span>AED ${fmtN(totalToFinance)}</span></div>
-    <div class="lr-row"><span>Monthly Payment (PPM)</span><span>AED ${ppm.toFixed(2)}</span></div>`;
+  // Fill slider tracks
+  fillSlider('lc-price-sl');
+  fillSlider('lc-dp-sl');
+  fillSlider('lc-rate-sl');
 }
 
 // ═══════════════════════════════════════
@@ -1820,6 +2844,8 @@ function renderSettings(){
   document.getElementById('s-salary').value=settings.salary||8700;
   document.getElementById('s-save-pct').value=settings.savePct||20;
   document.getElementById('s-fuel-bgt').value=settings.fuelBudget||1000;
+  _navDraft = [...navPages]; // reset draft to committed state each time settings opens
+  renderNavSettings();
   applyTheme();
 }
 function saveSettings(){
@@ -1827,7 +2853,7 @@ function saveSettings(){
   settings.savePct    = parseFloat(document.getElementById('s-save-pct').value)||20;
   settings.fuelBudget = parseFloat(document.getElementById('s-fuel-bgt').value)||1000;
   saveSettings2();
-  showToast('Settings saved ✓');
+  showToast(t('saved'));
   renderDashboard();
 }
 
@@ -1859,7 +2885,7 @@ function submitEdit() {
   });
   window._editCallback(vals);
   closeModal();
-  showToast('Updated ✓');
+  showToast(t('updated'));
 }
 
 function submitDelete() {
@@ -1938,22 +2964,36 @@ function editCleanCell(i) {
 // ═══════════════════════════════════════
 const REG_DEFAULTS = {
   renewal: [
-    {name:'Insurance (TPL)', val:680},
+    {name:'Insurance',       val:680},
     {name:'Renewal Test',    val:170},
     {name:'RTA Registration',val:370},
+    {name:'Fines',           val:0},
   ],
   first: [
-    {name:'Down Payment',          val:18500},
     {name:'Evaluation + Reports',  val:770},
     {name:'Bank Fees',             val:777},
-    {name:'Comprehensive Insurance',val:3700},
+    {name:'Insurance',              val:3700},
     {name:'Plates + RTA + Salik',  val:1265},
     {name:'Recovery + Fines',      val:200},
   ]
 };
 
 function loadRegCosts(type) {
-  try { const v=localStorage.getItem('reg_'+type); return v?JSON.parse(v):[...REG_DEFAULTS[type]]; } catch(e){ return [...REG_DEFAULTS[type]]; }
+  try {
+    const v = localStorage.getItem('reg_'+type);
+    if (!v) return [...REG_DEFAULTS[type]];
+    const parsed = JSON.parse(v);
+    // If 'first' still has Down Payment entry, reset to new defaults
+    if (type === 'first' && parsed.some(r => r.name === 'Down Payment' || r.name === 'Comprehensive Insurance')) {
+      localStorage.removeItem('reg_first');
+      return [...REG_DEFAULTS[type].map(r=>({...r}))];
+    }
+    if (type === 'renewal' && !parsed.some(r => r.name === 'Fines')) {
+      localStorage.removeItem('reg_renewal');
+      return [...REG_DEFAULTS[type].map(r=>({...r}))];
+    }
+    return parsed;
+  } catch(e) { return [...REG_DEFAULTS[type]]; }
 }
 function saveRegCosts(type,data){ try{localStorage.setItem('reg_'+type,JSON.stringify(data));}catch(e){} }
 
@@ -1965,7 +3005,7 @@ function renderRegCosts() {
       <div class="li-row">
         <span class="li-name">${r.name}</span>
         <span class="li-val" style="display:flex;align-items:center;gap:6px">
-          AED <input type="number" value="${r.val}" onchange="updateRegRow('${type}',${i},this.value)"
+          ${curr()} <input type="number" value="${r.val}" onchange="updateRegRow('${type}',${i},this.value)"
             style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:13px;font-weight:600;color:var(--text);width:80px;text-align:right;outline:none"
             onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
         </span>
@@ -1973,14 +3013,15 @@ function renderRegCosts() {
     document.getElementById('reg-'+type+'-rows').innerHTML = rows +
       `<div class="li-row" style="border-top:1px solid var(--border2);margin-top:4px;padding-top:10px">
         <span class="li-name" style="font-weight:700">Total</span>
-        <span class="li-val" style="font-weight:700;color:var(--gold)">AED ${fmtN(total)}</span>
+        <span class="li-val" style="font-weight:700;color:var(--gold)">${curr()} ${fmtN(total)}</span>
       </div>`;
   });
 }
 
 function updateRegRow(type, i, val) {
   const data = loadRegCosts(type);
-  data[i].val = parseFloat(val)||0;
+  const parsed = parseFloat(val);
+  data[i].val = isNaN(parsed) ? 0 : parsed;
   saveRegCosts(type, data);
   renderRegCosts();
 }
@@ -1992,18 +3033,9 @@ function resetRegCosts(type) {
 }
 
 function saveCleaningSettings() {
-  const newSess = parseInt(document.getElementById('s-clean-sess').value)||15;
-  settings.cleanStart  = document.getElementById('s-clean-start').value||'2026-06-19';
-  settings.cleanPrice  = parseFloat(document.getElementById('s-clean-price').value)||94.5;
-  if(newSess !== settings.cleanSess) {
-    const old = cleanData.sessions;
-    cleanData.sessions = Array(newSess).fill(false).map((_,i)=>i<old.length?old[i]:false);
-    saveClean();
-  }
-  settings.cleanSess = newSess;
+  // Settings are now edited via editCleanSetting() modal — this is a no-op stub
   saveSettings2();
   renderCleaning();
-  showToast('Cleaning settings saved ✓');
 }
 
 function saveKM() {
@@ -2105,12 +3137,12 @@ function calcTrip() {
   const costPerKm = total / totalDist;
   const resultHTML = `
     <div class="loan-result">
-      <div class="lr-row"><span>Distance</span><span>${totalDist} km${mult===2?' (round trip)':''}</span></div>
-      <div class="lr-row"><span>Fuel needed</span><span>${litresNeeded.toFixed(1)} litres</span></div>
-      <div class="lr-row"><span>Fuel cost</span><span>AED ${fuelCost.toFixed(2)}</span></div>
-      <div class="lr-row"><span>Salik / tolls</span><span>AED ${salikTotal.toFixed(2)}</span></div>
-      <div class="lr-row"><span>Cost per KM</span><span>AED ${costPerKm.toFixed(2)}</span></div>
-      <div class="lr-row"><span>Total Trip Cost</span><span>AED ${total.toFixed(2)}</span></div>
+      <div class="lr-row"><span>${t('dist_km')}</span><span>${totalDist} km${mult===2?' ('+t('return_trip')+')':''}</span></div>
+      <div class="lr-row"><span>${t('fuel_needed')}</span><span>${litresNeeded.toFixed(1)} ${t('litres')}</span></div>
+      <div class="lr-row"><span>${t('fuel_cost')}</span><span>${curr()} ${fuelCost.toFixed(2)}</span></div>
+      <div class="lr-row"><span>${t('salik_cost')}</span><span>${curr()} ${salikTotal.toFixed(2)}</span></div>
+      <div class="lr-row"><span>${t('cost_per_km')}</span><span>${curr()} ${costPerKm.toFixed(2)}</span></div>
+      <div class="lr-row"><span>${t('total_trip')}</span><span>${curr()} ${total.toFixed(2)}</span></div>
     </div>`;
   document.getElementById('trip-result').innerHTML = resultHTML;
 
@@ -2143,7 +3175,7 @@ function renderTripHistory() {
         <div style="font-size:13px;font-weight:600">${t.dist} km${t.round?' return':''} · ${t.fuelName}</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:3px">${consStr} · Salik AED ${t.salik.toFixed(0)} · ${ago}</div>
       </div>
-      <div style="font-size:15px;font-weight:700;color:var(--gold);white-space:nowrap">AED ${t.total.toFixed(2)}</div>
+      <div style="font-size:15px;font-weight:700;color:var(--gold);white-space:nowrap">${curr()} ${t.total.toFixed(2)}</div>
     </div>`;
   }).join('');
 }
@@ -2203,6 +3235,7 @@ function doConfirmDelete() {
   if (fn) fn();
 }
 
+
 // ═══════════════════════════════════════
 //  EXPORT / IMPORT
 // ═══════════════════════════════════════
@@ -2225,10 +3258,10 @@ function exportData() {
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
-  a.download = 'mytracker-backup-' + new Date().toISOString().split('T')[0] + '.json';
+  a.download = 'daftar-backup-' + new Date().toISOString().split('T')[0] + '.json';
   a.click();
   URL.revokeObjectURL(url);
-  showToast('Exported ✓');
+  showToast(t('export_ok'));
 }
 
 function importData(event) {
@@ -2238,8 +3271,8 @@ function importData(event) {
   reader.onload = e => {
     try {
       const d = JSON.parse(e.target.result);
-      if (!d.version || !d.fuel) { showToast('Invalid backup file'); return; }
-      if (!confirm('Replace ALL your data with this backup? This cannot be undone.')) return;
+      if (!d.version || !d.fuel) { showToast(t('invalid_file')); return; }
+      if (!window.confirm('Replace ALL your data with this backup? This cannot be undone.')) return;
       if (d.fuel)     { fuelData    = d.fuel;     saveFuel(); }
       if (d.spend)    { spendData   = d.spend;    saveSpend(); }
       if (d.car)      { carData     = d.car;      saveCar(); }
@@ -2251,9 +3284,9 @@ function importData(event) {
       if (d.regCosts) { regCosts    = d.regCosts; saveRegCosts(); }
       if (d.tripHistory) { tripHistory = d.tripHistory; saveTripHistory(); }
       renderDashboard();
-      showToast('Import successful ✓');
+      showToast(t('import_ok'));
     } catch(err) {
-      showToast('Failed to read file');
+      showToast(t('import_fail'));
     }
     event.target.value = ''; // reset input
   };
@@ -2264,7 +3297,12 @@ function importData(event) {
 //  INIT
 // ═══════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
+  // Init lang + dir
+  document.documentElement.setAttribute('dir', currentLang==='ar'?'rtl':'ltr');
+  document.documentElement.setAttribute('lang', currentLang);
   applyTheme();
+  applyTranslations();
+  renderNav();
   renderDashboard();
   // Pre-load cached fuel prices, then fetch fresh in background
   renderRegCosts();

@@ -1,11 +1,11 @@
 {
-  "name": "My Personal Tracker",
-  "short_name": "MY.TRACKER",
-  "description": "Personal finance and fuel tracker",
+  "name": "Daftar | دفتر",
+  "short_name": "Daftar",
+  "description": "دفترك الشخصي — Your personal finance, fuel & car tracker",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0d0f14",
-  "theme_color": "#0d0f14",
+  "background_color": "#0a0a0b",
+  "theme_color": "#0a0a0b",
   "orientation": "portrait",
   "icons": [
     {
@@ -15,5 +15,9 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["finance", "utilities"]
+  "categories": [
+    "finance",
+    "utilities",
+    "lifestyle"
+  ]
 }
