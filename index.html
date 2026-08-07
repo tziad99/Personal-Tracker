@@ -395,6 +395,43 @@ svg{display:block}
 #loan-summary-card .lr-row{display:flex;justify-content:space-between;padding:7px 0;font-size:13px;border-bottom:1px solid var(--border)}
 #loan-summary-card .lr-row:last-child{border-bottom:none}
 
+
+/* ─── PAGE TUTORIAL ─── */
+.tutorial-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:99998;display:flex;align-items:flex-end;justify-content:center;padding-bottom:calc(env(safe-area-inset-bottom,0px)+80px);animation:fadeIn .25s ease}
+.tutorial-card{background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 20px 20px;padding:24px 20px 20px;max-width:420px;width:calc(100% - 32px);box-shadow:0 8px 40px rgba(0,0,0,.6)}
+.tutorial-icon{font-size:32px;margin-bottom:10px;text-align:center}
+.tutorial-title{font-size:17px;font-weight:700;margin-bottom:6px;text-align:center}
+.tutorial-tips{list-style:none;padding:0;margin:12px 0 16px}
+.tutorial-tips li{font-size:13px;color:var(--text-dim);padding:5px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.tutorial-tips li:last-child{border-bottom:none}
+.tutorial-tips li span.tip-icon{flex-shrink:0;font-size:14px}
+.tutorial-btn{width:100%;padding:13px;background:var(--gold);color:#0a0a0b;font-weight:700;font-size:14px;border-radius:var(--r-sm);border:none;cursor:pointer}
+.tutorial-skip{width:100%;padding:8px;background:none;color:var(--text-mute);font-size:12px;border:none;cursor:pointer;margin-top:4px}
+
+
+/* ─── ONBOARDING ─── */
+#onboarding{position:fixed;inset:0;background:var(--bg);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 0 env(safe-area-inset-bottom,20px)}
+#onboarding.hidden{display:none}
+.ob-slide{width:100%;max-width:480px;padding:32px 24px 20px;display:none;flex-direction:column;align-items:center;text-align:center;animation:slideUp .3s ease}
+.ob-slide.active{display:flex}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.ob-logo{font-size:48px;font-weight:800;color:var(--gold);font-family:'Geeza Pro','Arial Unicode MS',serif;margin-bottom:8px}
+.ob-tagline{font-size:13px;color:var(--text-dim);letter-spacing:1px;margin-bottom:32px}
+.ob-icon{font-size:40px;margin-bottom:14px}
+.ob-title{font-size:22px;font-weight:700;margin-bottom:8px}
+.ob-sub{font-size:14px;color:var(--text-dim);line-height:1.6;margin-bottom:24px}
+.ob-field{width:100%;margin-bottom:14px;text-align:left}
+.ob-field label{font-size:12px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:6px;letter-spacing:.5px}
+.ob-field input,.ob-field select{width:100%;box-sizing:border-box;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px 14px;font-size:16px;color:var(--text);outline:none;-webkit-appearance:none;transition:border-color .2s}
+.ob-field input:focus,.ob-field select:focus{border-color:var(--gold)}
+.ob-btn{width:100%;padding:15px;background:var(--gold);color:#0a0a0b;font-weight:700;font-size:16px;border-radius:var(--r-sm);border:none;cursor:pointer;margin-top:8px;transition:opacity .2s}
+.ob-btn:active{opacity:.8}
+.ob-skip{font-size:12px;color:var(--text-mute);background:none;border:none;cursor:pointer;padding:12px;width:100%}
+.ob-dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
+.ob-dot{width:6px;height:6px;border-radius:3px;background:var(--border);transition:all .3s}
+.ob-dot.active{width:20px;background:var(--gold)}
+.ob-progress{font-size:11px;color:var(--text-mute);margin-bottom:8px}
+
 </style>
 </head>
 <body>
@@ -913,232 +950,20 @@ svg{display:block}
 //  DEFAULT SETTINGS
 // ═══════════════════════════════════════
 const DEFAULTS = {
-  salary: 8700,
+  salary: 0,
   savePct: 20,
-  fuelBudget: 1000,
-  cleanStart: '2026-06-19',
+  fuelBudget: 500,
+  cleanStart: new Date().toISOString().split('T')[0],
   cleanSess: 15,
-  cleanPrice: 94.5,
-  currentKM: 101000,
+  cleanPrice: 0,
+  currentKM: 0,
   theme: 'dark'
 };
 
 // ═══════════════════════════════════════
 //  SEED DATA
 // ═══════════════════════════════════════
-const SEED_FUEL = [
-  {date:"2024-08-12",type:"Special",station:"Emarat",amount:50.0},
-  {date:"2024-08-12",type:"Super",station:"Adnoc",amount:122.55},
-  {date:"2024-08-15",type:"Super",station:"Eppco",amount:50.0},
-  {date:"2024-08-15",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2024-08-17",type:"Super",station:"Adnoc",amount:175.01},
-  {date:"2024-08-21",type:"Super",station:"Adnoc",amount:170.01},
-  {date:"2024-08-25",type:"Super",station:"Adnoc",amount:178.01},
-  {date:"2024-08-30",type:"Super",station:"Adnoc",amount:168.79},
-  {date:"2024-09-03",type:"Super",station:"Adnoc",amount:200.0},
-  {date:"2024-09-07",type:"Super",station:"Adnoc",amount:167.02},
-  {date:"2024-09-10",type:"Super",station:"Adnoc",amount:145.01},
-  {date:"2024-09-13",type:"Super",station:"Adnoc",amount:167.39},
-  {date:"2024-09-17",type:"Super",station:"Adnoc",amount:244.01},
-  {date:"2024-09-23",type:"Super",station:"Adnoc",amount:150.02},
-  {date:"2024-09-27",type:"Super",station:"Adnoc",amount:160.02},
-  {date:"2024-10-01",type:"Super",station:"Adnoc",amount:159.01},
-  {date:"2024-10-04",type:"Super",station:"Adnoc",amount:150.0},
-  {date:"2024-10-07",type:"Super",station:"Adnoc",amount:151.06},
-  {date:"2024-10-08",type:"Super",station:"Adnoc",amount:50.0},
-  {date:"2024-10-09",type:"Super",station:"Adnoc",amount:153.0},
-  {date:"2024-10-12",type:"Special",station:"Adnoc",amount:80.0},
-  {date:"2024-10-16",type:"Super",station:"Eppco",amount:50.0},
-  {date:"2024-10-17",type:"Super",station:"Adnoc",amount:152.0},
-  {date:"2024-10-17",type:"Super",station:"Enoc",amount:40.0},
-  {date:"2024-10-17",type:"Super",station:"Adnoc",amount:128.09},
-  {date:"2024-10-24",type:"Super",station:"Adnoc",amount:150.0},
-  {date:"2024-10-26",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2024-10-27",type:"Super",station:"Adnoc",amount:110.02},
-  {date:"2024-11-01",type:"Super",station:"Adnoc",amount:140.06},
-  {date:"2024-11-05",type:"Super",station:"Adnoc",amount:122.01},
-  {date:"2024-11-08",type:"Super",station:"Adnoc",amount:155.0},
-  {date:"2024-11-14",type:"Super",station:"Adnoc",amount:145.0},
-  {date:"2024-11-18",type:"Super",station:"Adnoc",amount:158.04},
-  {date:"2024-11-22",type:"Super",station:"Adnoc",amount:157.0},
-  {date:"2024-12-01",type:"Super",station:"Adnoc",amount:135.02},
-  {date:"2024-12-06",type:"Super",station:"Adnoc",amount:146.0},
-  {date:"2024-12-13",type:"Super",station:"Adnoc",amount:150.02},
-  {date:"2024-12-17",type:"Super",station:"Enoc",amount:50.0},
-  {date:"2024-12-18",type:"Super",station:"Adnoc",amount:145.01},
-  {date:"2024-12-19",type:"Super",station:"Emarat",amount:50.0},
-  {date:"2024-12-20",type:"Super",station:"Adnoc",amount:139.0},
-  {date:"2024-12-24",type:"Super",station:"Adnoc",amount:133.01},
-  {date:"2025-01-01",type:"Super",station:"Adnoc",amount:140.0},
-  {date:"2025-01-06",type:"Super",station:"Adnoc",amount:147.0},
-  {date:"2025-01-11",type:"Super",station:"Adnoc",amount:126.01},
-  {date:"2025-01-15",type:"Super",station:"Adnoc",amount:122.03},
-  {date:"2025-01-19",type:"Super",station:"Adnoc",amount:133.52},
-  {date:"2025-01-22",type:"Super",station:"Adnoc",amount:95.03},
-  {date:"2025-01-25",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-01-28",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-01-31",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-02-02",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-02-07",type:"Super",station:"Enoc",amount:50.0},
-  {date:"2025-02-09",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-02-11",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-02-15",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-02-18",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-02-19",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-02-21",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-02-24",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-03-01",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-03-04",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-03-07",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-03-10",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-03-13",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-03-15",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-03-16",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-03-18",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-03-23",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-03-27",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-03-31",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-04-04",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-04-09",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-04-11",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-04-13",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-04-20",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-04-23",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-04-25",type:"Super",station:"Enoc",amount:30.0},
-  {date:"2025-04-26",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-04-30",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-05-03",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-05-05",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-05-07",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-05-10",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-05-12",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-05-14",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-05-16",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-05-20",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-05-23",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-05-25",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-06-02",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-06-04",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-06-08",type:"Super",station:"Enoc",amount:30.0},
-  {date:"2025-06-09",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-06-11",type:"Super",station:"Enoc",amount:30.0},
-  {date:"2025-06-12",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-06-14",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-06-17",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-06-20",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-06-23",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-06-26",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-06-29",type:"Super",station:"Adnoc",amount:120.0},
-  {date:"2025-07-01",type:"Super",station:"Adnoc",amount:105.01},
-  {date:"2025-07-04",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-07-08",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-07-11",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-07-14",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-07-17",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-07-19",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-07-22",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-07-24",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-07-30",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-08-01",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-08-04",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-08-07",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-08-09",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-08-12",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-08-15",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-08-16",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-08-19",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-08-21",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-08-23",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-08-26",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-08-28",type:"Super",station:"Enoc",amount:50.0},
-  {date:"2025-08-29",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-09-01",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-09-03",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-09-07",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-09-12",type:"Super",station:"Enoc",amount:50.0},
-  {date:"2025-09-13",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-09-15",type:"Super",station:"Enoc",amount:30.0},
-  {date:"2025-09-15",type:"Super",station:"Adnoc",amount:137.81},
-  {date:"2025-09-25",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-10-02",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-10-07",type:"Special",station:"Adnoc",amount:80.0},
-  {date:"2025-10-11",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-10-15",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-10-17",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-10-20",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-10-24",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-10-29",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-10-31",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-11-02",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-11-06",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-11-10",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-11-13",type:"Super",station:"Adnoc",amount:100.0,note:"paid 95 from points!"},
-  {date:"2025-11-17",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2025-11-20",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-11-21",type:"Super",station:"Enoc",amount:50.0},
-  {date:"2025-11-24",type:"Super",station:"Enoc",amount:50.0},
-  {date:"2025-11-27",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-11-29",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-12-01",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-12-04",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-12-06",type:"Super",station:"Enoc",amount:100.0},
-  {date:"2025-12-08",type:"Special",station:"Enoc",amount:50.0},
-  {date:"2025-12-12",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-12-16",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2025-12-20",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-01-01",type:"Super",station:"Adnoc",amount:200.0},
-  {date:"2026-01-05",type:"Special",station:"Enoc",amount:50.0},
-  {date:"2026-01-09",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-01-12",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-01-14",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-01-18",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-01-20",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-01-24",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-01-27",type:"Super",station:"Adnoc",amount:180.0},
-  {date:"2026-02-01",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-02-04",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-02-06",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-02-08",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-02-11",type:"Super",station:"Enoc",amount:50.0},
-  {date:"2026-02-13",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2026-02-16",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-02-18",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2026-02-21",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-02-25",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-02-27",type:"Super",station:"Adnoc",amount:90.03},
-  {date:"2026-03-09",type:"Super",station:"Adnoc",amount:80.0},
-  {date:"2026-03-18",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-03-28",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-03-29",type:"Super",station:"Emarat",amount:111.89},
-  {date:"2026-04-04",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-04-06",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-04-09",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-04-12",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-04-14",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-04-18",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-04-20",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-04-22",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-04-23",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-04-25",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-04-28",type:"Super",station:"Adnoc",amount:192.01},
-  {date:"2026-05-02",type:"Special",station:"Adnoc",amount:100.0},
-  {date:"2026-05-04",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-05-06",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-05-09",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-05-11",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-05-13",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-05-16",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-05-20",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-05-26",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-05-29",type:"Super",station:"Adnoc",amount:145.01},
-  {date:"2026-06-03",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-06-05",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-06-07",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-06-09",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-06-12",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-06-15",type:"Super",station:"Adnoc",amount:100.0},
-  {date:"2026-06-17",type:"Super",station:"Adnoc",amount:100.0},
-];
+const SEED_FUEL = [];
 const SEED_SPEND=[
   {name:"Car Expenses",monthly:3008.8},{name:"Rent",monthly:3000},{name:"Pocket Money",monthly:1000},
   {name:"Food at Work",monthly:800},{name:"Phone Bill",monthly:60},{name:"Clothing",monthly:100},{name:"Barber",monthly:50},
@@ -1236,6 +1061,147 @@ let currentPage='dashboard';
 let fuelFilter=null;
 let fuelYearFilter=null;
 
+
+
+// ═══════════════════════════════════════
+//  PAGE TUTORIALS (first-open only)
+// ═══════════════════════════════════════
+const TUTORIALS = {
+  dashboard: {
+    icon: '📊',
+    title: 'Dashboard',
+    tips: [
+      ['⛽', 'The fuel gauge shows this month\'s spend vs your budget'],
+      ['💰', 'Savings Health ring tracks how close you are to your savings target'],
+      ['📈', 'The bar chart shows 6 months of fuel spending at a glance'],
+      ['➕', 'Tap the gold + button to log a new fill-up quickly'],
+      ['👆', 'Tap any recent fill-up to edit it'],
+    ]
+  },
+  fuel: {
+    icon: '⛽',
+    title: 'Fuel Log',
+    tips: [
+      ['📅', 'Pick a year then a month to filter your fill-ups'],
+      ['➕', 'Tap the gold + button to add a new fill-up'],
+      ['✏️', 'Tap the pen icon on any entry to edit or delete it'],
+      ['📊', 'The top stats update to match whichever year/month you select'],
+      ['⏱️', 'Each entry shows the gap in days since the previous fill-up'],
+    ]
+  },
+  budget: {
+    icon: '💰',
+    title: 'Budget',
+    tips: [
+      ['🚗', 'Car Expenses is calculated automatically from Car Cost Detail below'],
+      ['✏️', 'Tap the pen icon on any spending row to edit it'],
+      ['➕', 'Use the bottom row to add a new spending category'],
+      ['📊', 'Bars turn amber above 20% and red above 40% of salary'],
+      ['🔄', 'Salik is the only car cost you edit manually — the rest are auto'],
+    ]
+  },
+  cleaning: {
+    icon: '🧼',
+    title: 'Car Cleaning',
+    tips: [
+      ['✅', 'Tap any session box to mark it done — you\'ll be asked for the date'],
+      ['✏️', 'Tap the pen icons in Subscription Info to edit your plan details'],
+      ['🔄', 'Use Reset All Sessions at the bottom to start a new month'],
+      ['💰', 'Cost updates automatically based on sessions done × price per session'],
+    ]
+  },
+  maintenance: {
+    icon: '🔧',
+    title: 'Maintenance',
+    tips: [
+      ['🔢', 'Always update your current mileage at the top first'],
+      ['📅', 'Service intervals calculate the next due KM from your last real service'],
+      ['➕', 'Use the Add Service Record card to log any workshop visit'],
+      ['🔍', 'Search the history by name, workshop, or KM'],
+      ['📄', 'You can attach a receipt photo to any service entry'],
+    ]
+  },
+  checklist: {
+    icon: '✅',
+    title: 'Checklist',
+    tips: [
+      ['☑️', 'Tap the circle to mark an issue or mod as done'],
+      ['✏️', 'Tap the pen to edit the label, priority, or price'],
+      ['📌', 'P1 is highest priority — items sort automatically'],
+      ['📊', 'Progress bars at the top show how many are completed'],
+      ['➕', 'Use the input at the bottom of each section to add new items'],
+    ]
+  },
+  loan: {
+    icon: '🚘',
+    title: 'Loan Calculator',
+    tips: [
+      ['🎚️', 'Drag the sliders or type directly in the value boxes'],
+      ['📅', 'Tap 1–5 year buttons to change the loan period'],
+      ['📋', 'Annual Renewal and First-Time Registration costs are fully editable'],
+      ['↺', 'Tap Reset on any cost section to restore the default values'],
+      ['💡', 'All calculations use flat-rate interest (standard UAE bank formula)'],
+    ]
+  },
+  trip: {
+    icon: '🗺️',
+    title: 'Trip Calculator',
+    tips: [
+      ['⚡', 'Tap a Quick Preset to fill in your usual routes instantly'],
+      ['🔄', 'Prices auto-fetch from live UAE fuel price data'],
+      ['🕐', 'Your last 3 trip calculations are saved automatically below'],
+      ['⛽', 'Switch between L/100km and km/L for fuel consumption'],
+    ]
+  },
+  settings: {
+    icon: '⚙️',
+    title: 'Settings',
+    tips: [
+      ['💱', 'Change currency to any GCC currency or USD'],
+      ['🌐', 'Toggle between English and Arabic — the full app translates'],
+      ['🌗', 'Switch between Dark and Light mode'],
+      ['📌', 'Customise which pages appear in your bottom navigation bar'],
+      ['💾', 'Export your data as a backup before switching devices'],
+    ]
+  },
+};
+
+function showTutorial(page) {
+  const tut = TUTORIALS[page];
+  if (!tut) return;
+  // Check if already seen
+  const seenKey = 'tut_seen_' + page;
+  if (localStorage.getItem(seenKey)) return;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'tutorial-overlay';
+  overlay.id = 'tutorial-overlay';
+  overlay.innerHTML = `
+    <div class="tutorial-card">
+      <div class="tutorial-icon">${tut.icon}</div>
+      <div class="tutorial-title">${tut.title}</div>
+      <ul class="tutorial-tips">
+        ${tut.tips.map(([icon,tip])=>`<li><span class="tip-icon">${icon}</span><span>${tip}</span></li>`).join('')}
+      </ul>
+      <button class="tutorial-btn" onclick="dismissTutorial('${page}')">Got it 👍</button>
+      <button class="tutorial-skip" onclick="dismissAllTutorials()">Skip all tutorials</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  // Tap outside to dismiss
+  overlay.addEventListener('click', e => { if(e.target===overlay) dismissTutorial(page); });
+}
+
+function dismissTutorial(page) {
+  localStorage.setItem('tut_seen_' + page, '1');
+  const el = document.getElementById('tutorial-overlay');
+  if (el) el.remove();
+}
+
+function dismissAllTutorials() {
+  Object.keys(TUTORIALS).forEach(p => localStorage.setItem('tut_seen_' + p, '1'));
+  const el = document.getElementById('tutorial-overlay');
+  if (el) el.remove();
+}
 
 // ═══════════════════════════════════════
 //  DYNAMIC NAV
@@ -1896,6 +1862,7 @@ function switchPage(p){
   document.getElementById('page-'+p).classList.add('active');
   document.getElementById('page-title').textContent=getPageTitle(p);
   renderNav();
+  setTimeout(()=>showTutorial(p), 400);
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   const ni=['dashboard','fuel','budget'].indexOf(p);
   if(ni>=0)document.querySelectorAll('.nav-btn')[ni].classList.add('active');
@@ -2069,7 +2036,7 @@ function renderDashboard(){
   // Gauge
   const mf=fuelData.filter(f=>getMK(f.date)===mk);
   const spent=mf.reduce((s,f)=>s+f.amount,0);
-  const bgt=settings.fuelBudget||1000;
+  const bgt=settings.fuelBudget||0;
   const pct=Math.min(spent/bgt,1);
   const fill=document.getElementById('gauge-fill');
   fill.setAttribute('stroke-dashoffset',251.2);fill.classList.remove('danger','warn');
@@ -2088,7 +2055,7 @@ function renderDashboard(){
     <div class="gm-item"><div class="gv" style="color:${rem>0?'var(--gold)':'var(--red)'}">${rem>0?fmtN(rem):'Over!'}</div><div class="gl">${t('remaining')}</div></div>
     <div class="gm-item"><div class="gv">${fmtN(bgt)}</div><div class="gl">${t('budget')}</div></div>`;
   // Stats — sync Car Expenses from live data before summing
-  const sal=settings.salary||8700;
+  const sal=settings.salary||0;
   const _petrolAvg = calcPetrolAvg();
   const _svcAvgMo  = calcSvcAvgPerYear() / 12;
   const _carTotal  = carData.reduce((sum,item)=>{
@@ -2261,7 +2228,7 @@ function calcPetrolAvg() {
 //  BUDGET PAGE
 // ═══════════════════════════════════════
 function renderBudget(){
-  const sal      = settings.salary || 8700;
+  const sal      = settings.salary || 0;
   const petrolAvg = calcPetrolAvg();
   const svcAvgMo  = calcSvcAvgPerYear() / 12;   // annual avg → monthly
 
@@ -2841,15 +2808,15 @@ function renderPC(){
 //  SETTINGS PAGE
 // ═══════════════════════════════════════
 function renderSettings(){
-  document.getElementById('s-salary').value=settings.salary||8700;
+  document.getElementById('s-salary').value=settings.salary||0;
   document.getElementById('s-save-pct').value=settings.savePct||20;
-  document.getElementById('s-fuel-bgt').value=settings.fuelBudget||1000;
+  document.getElementById('s-fuel-bgt').value=settings.fuelBudget||0;
   _navDraft = [...navPages]; // reset draft to committed state each time settings opens
   renderNavSettings();
   applyTheme();
 }
 function saveSettings(){
-  settings.salary     = parseFloat(document.getElementById('s-salary').value)||8700;
+  settings.salary     = parseFloat(document.getElementById('s-salary').value)||0;
   settings.savePct    = parseFloat(document.getElementById('s-save-pct').value)||20;
   settings.fuelBudget = parseFloat(document.getElementById('s-fuel-bgt').value)||1000;
   saveSettings2();
@@ -3251,17 +3218,28 @@ function exportData() {
     mods: modsData,
     cleaning: cleanData,
     settings: settings,
-    regCosts: regCosts,
+    regCosts: { renewal: loadRegCosts('renewal'), first: loadRegCosts('first') },
     tripHistory: tripHistory,
   };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = 'daftar-backup-' + new Date().toISOString().split('T')[0] + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast(t('export_ok'));
+  const json = JSON.stringify(data, null, 2);
+
+  // Show copyable modal — works everywhere including sandboxed viewers
+  document.getElementById('modal-title').textContent = '\u{1F4BE} Copy Your Backup Data';
+  document.getElementById('modal-body').innerHTML =
+    `<p style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Tap the button below to copy all your data, then paste it into a notes app and save as <b>daftar-backup.json</b></p>
+     <textarea id="export-textarea" readonly
+       style="width:100%;height:200px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;font-size:9px;font-family:monospace;color:var(--text);resize:none;outline:none;box-sizing:border-box;-webkit-user-select:text;user-select:text">${json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
+     <button class="btn-p" style="margin-top:12px" onclick="
+       const ta=document.getElementById('export-textarea');
+       ta.select();ta.setSelectionRange(0,99999);
+       if(navigator.clipboard){
+         navigator.clipboard.writeText(ta.value).then(()=>showToast('Copied \u2713')).catch(()=>{try{document.execCommand('copy');showToast('Copied \u2713');}catch(e){showToast('Long-press the text above to copy');}});
+       } else {
+         try{document.execCommand('copy');showToast('Copied \u2713');}catch(e){showToast('Long-press the text above to copy');}
+       }
+     ">\u{1F4CB} Copy All to Clipboard</button>
+     <button class="btn-sec" onclick="closeModal()" style="margin-top:8px;width:100%;padding:13px;border-radius:var(--r-sm)">Close</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
 }
 
 function importData(event) {
@@ -3281,7 +3259,10 @@ function importData(event) {
       if (d.mods)     { modsData    = d.mods;     saveMods(); }
       if (d.cleaning) { cleanData   = d.cleaning; saveClean(); }
       if (d.settings) { settings    = d.settings; saveSettings2(); applyTheme(); }
-      if (d.regCosts) { regCosts    = d.regCosts; saveRegCosts(); }
+      if (d.regCosts) {
+        if (d.regCosts.renewal) saveRegCosts('renewal', d.regCosts.renewal);
+        if (d.regCosts.first)   saveRegCosts('first',   d.regCosts.first);
+      }
       if (d.tripHistory) { tripHistory = d.tripHistory; saveTripHistory(); }
       renderDashboard();
       showToast(t('import_ok'));
@@ -3291,6 +3272,74 @@ function importData(event) {
     event.target.value = ''; // reset input
   };
   reader.readAsText(file);
+}
+
+
+// ═══════════════════════════════════════
+//  ONBOARDING
+// ═══════════════════════════════════════
+function showOnboarding() {
+  // Clear any stale default salary from previous sessions
+  if (!settings.salary || settings.salary === 8700) {
+    settings.salary = 0;
+    saveSettings2();
+  }
+  const ob = document.getElementById('onboarding');
+  if (ob) ob.classList.remove('hidden');
+}
+
+function obNext(step) {
+  // Save data from previous step
+  if (step === 2) {
+    const sal = parseFloat(document.getElementById('ob-salary').value) || 0;
+    const pct = parseFloat(document.getElementById('ob-savepct').value) || 20;
+    const bgt = parseFloat(document.getElementById('ob-fuelbgt').value) || 0;
+    settings.salary     = sal;
+    settings.savePct    = pct;
+    settings.fuelBudget = bgt;
+    saveSettings2();
+  }
+  if (step === 3) {
+    const km   = parseFloat(document.getElementById('ob-km').value)      || 0;
+    const loan = parseFloat(document.getElementById('ob-carloan').value)  || 0;
+    const salik= parseFloat(document.getElementById('ob-salik').value)   || 0;
+    settings.currentKM = km;
+    saveSettings2();
+    // Update car data
+    const loanIdx = carData.findIndex(c=>c.name.toLowerCase().includes('loan'));
+    if (loanIdx>-1) { carData[loanIdx].monthly = loan; } else { carData.push({name:'Car Loan', monthly:loan}); }
+    const salikIdx = carData.findIndex(c=>c.name.toLowerCase().includes('salik'));
+    if (salikIdx>-1) { carData[salikIdx].monthly = salik; } else { carData.push({name:'Salik', monthly:salik}); }
+    saveCar();
+  }
+
+  // Switch slides
+  document.querySelectorAll('.ob-slide').forEach(s=>s.classList.remove('active'));
+  const next = document.getElementById('ob-'+step);
+  if (next) next.classList.add('active');
+
+  // Update dots
+  document.querySelectorAll('.ob-dot').forEach((d,i)=>{
+    d.classList.toggle('active', i<=step);
+  });
+}
+
+function finishOnboarding() {
+  localStorage.setItem('ob_done', '1');
+  const ob = document.getElementById('onboarding');
+  if (ob) {
+    ob.style.opacity = '0';
+    ob.style.transition = 'opacity .3s';
+    setTimeout(()=>ob.classList.add('hidden'), 300);
+  }
+  renderDashboard();
+}
+
+function skipOnboarding() {
+  localStorage.setItem('ob_done', '1');
+  const ob = document.getElementById('onboarding');
+  if (ob) ob.classList.add('hidden');
+  renderDashboard();
 }
 
 // ═══════════════════════════════════════
@@ -3303,7 +3352,18 @@ document.addEventListener('DOMContentLoaded',()=>{
   applyTheme();
   applyTranslations();
   renderNav();
+  // One-time migration: clear stale default values that were hardcoded before onboarding
+  if (settings.salary === 8700 && !localStorage.getItem('ob_done')) {
+    settings.salary = 0; saveSettings2();
+  }
+  if (settings.currentKM === 101000) {
+    settings.currentKM = 0; saveSettings2();
+  }
   renderDashboard();
+  // Show onboarding on first launch
+  if (!localStorage.getItem('ob_done')) {
+    showOnboarding();
+  }
   // Pre-load cached fuel prices, then fetch fresh in background
   renderRegCosts();
   const cachedPrices = loadFuelPriceCache();
@@ -3313,5 +3373,76 @@ document.addEventListener('DOMContentLoaded',()=>{
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 });
 </script>
+
+<!-- ══ ONBOARDING ══ -->
+<div id="onboarding" class="hidden">
+  <!-- Dots -->
+  <div style="width:100%;max-width:480px;padding:20px 24px 0;display:flex;justify-content:space-between;align-items:center">
+    <div class="ob-dots">
+      <div class="ob-dot active" id="ob-dot-0"></div>
+      <div class="ob-dot" id="ob-dot-1"></div>
+      <div class="ob-dot" id="ob-dot-2"></div>
+      <div class="ob-dot" id="ob-dot-3"></div>
+    </div>
+    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+  </div>
+
+  <!-- Slide 0: Welcome -->
+  <div class="ob-slide active" id="ob-0">
+    <div class="ob-logo">دفتر</div>
+    <div class="ob-tagline">YOUR PERSONAL TRACKER</div>
+    <div class="ob-sub">Track your fuel, budget, car maintenance, and more — all in one place.<br><br>Let's set up the basics in 3 quick steps.</div>
+    <button class="ob-btn" onclick="obNext(1)">Get Started →</button>
+  </div>
+
+  <!-- Slide 1: Finances -->
+  <div class="ob-slide" id="ob-1">
+    <div class="ob-icon">💰</div>
+    <div class="ob-title">Your Finances</div>
+    <div class="ob-sub">These help calculate your savings health and budget breakdown.</div>
+    <div class="ob-field">
+      <label>MONTHLY SALARY</label>
+      <input type="number" id="ob-salary" placeholder="e.g. 12,000" inputmode="numeric"/>
+    </div>
+    <div class="ob-field">
+      <label>SAVINGS TARGET (%)</label>
+      <input type="number" id="ob-savepct" placeholder="e.g. 20" value="20" inputmode="numeric"/>
+    </div>
+    <div class="ob-field">
+      <label>MONTHLY FUEL BUDGET</label>
+      <input type="number" id="ob-fuelbgt" placeholder="e.g. 800" inputmode="numeric"/>
+    </div>
+    <button class="ob-btn" onclick="obNext(2)">Next →</button>
+  </div>
+
+  <!-- Slide 2: Car -->
+  <div class="ob-slide" id="ob-2">
+    <div class="ob-icon">🚗</div>
+    <div class="ob-title">Your Car</div>
+    <div class="ob-sub">Used to track maintenance intervals and calculate service schedules.</div>
+    <div class="ob-field">
+      <label>CURRENT MILEAGE (KM)</label>
+      <input type="number" id="ob-km" placeholder="e.g. 55,000" inputmode="numeric"/>
+    </div>
+    <div class="ob-field">
+      <label>MONTHLY CAR LOAN PAYMENT</label>
+      <input type="number" id="ob-carloan" placeholder="e.g. 1,470" inputmode="numeric"/>
+    </div>
+    <div class="ob-field">
+      <label>MONTHLY SALIK</label>
+      <input type="number" id="ob-salik" placeholder="e.g. 360" inputmode="numeric"/>
+    </div>
+    <button class="ob-btn" onclick="obNext(3)">Next →</button>
+  </div>
+
+  <!-- Slide 3: Ready -->
+  <div class="ob-slide" id="ob-3">
+    <div class="ob-icon">🎉</div>
+    <div class="ob-title">You're all set!</div>
+    <div class="ob-sub">Daftar is ready to go. You can always update these values in Settings anytime.<br><br>Each page has a short tutorial the first time you open it.</div>
+    <button class="ob-btn" onclick="finishOnboarding()">Open Daftar →</button>
+  </div>
+</div>
+
 </body>
 </html>
