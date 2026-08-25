@@ -1138,6 +1138,8 @@ svg{display:block}
       <button class="btn-export" id="btn-export-csv" onclick="exportCSV()" style="margin-top:8px">📊 <span id="lbl-export-csv">Export Expenses as CSV</span></button>
       <label class="btn-export" for="import-file" style="margin-top:8px;cursor:pointer" id="lbl-import-data">⬆️ Import Data</label>
       <input type="file" id="import-file" accept=".json" onchange="importData(event)"/>
+      <label class="btn-export" for="import-csv-file" style="margin-top:8px;cursor:pointer" id="lbl-import-csv-data">📊 <span id="lbl-import-csv-btn">Import Expenses from CSV</span></label>
+      <input type="file" id="import-csv-file" accept=".csv,text/csv" onchange="importCSV(event)"/>
     </div>
 
     <div class="card" style="margin-top:12px;border-color:var(--red-dim,rgba(232,90,90,.3))">
@@ -2180,6 +2182,7 @@ const T = {
     export_ok:'Exported ✓', km_saved:'KM saved ✓', cleaning_saved:'Cleaning settings saved ✓',
     manage_cats_sub:'Customize icons and colors, or add your own categories.', manage_cats_title:'🎨 Categories',
     edit_cats_btn:'Edit Icons & Colors', add_cat_btn:'Add Custom Category', export_csv_btn:'Export Expenses as CSV',
+    import_csv_btn:'Import Expenses from CSV',
     delete_confirm:'Delete this entry?', delete_entry_btn:'Delete',
     progress_done:'done', empty_fuel:'No entries', empty_svc:'No records for this year',
     just_now:'just now', ago:'ago',
@@ -2329,6 +2332,7 @@ const T = {
     export_ok:'تم التصدير ✓', km_saved:'تم حفظ الكيلومتر ✓', cleaning_saved:'تم حفظ إعدادات الغسيل ✓',
     manage_cats_sub:'خصّص الأيقونات والألوان، أو أضف فئاتك الخاصة.', manage_cats_title:'🎨 الفئات',
     edit_cats_btn:'تعديل الأيقونات والألوان', add_cat_btn:'إضافة فئة مخصصة', export_csv_btn:'تصدير المصاريف كـ CSV',
+    import_csv_btn:'استيراد المصاريف من CSV',
     delete_confirm:'حذف هذا السجل؟', delete_entry_btn:'حذف',
     progress_done:'منجز', empty_fuel:'لا يوجد سجلات', empty_svc:'لا يوجد سجلات لهذا العام',
     just_now:'الآن', ago:'مضت',
@@ -2452,6 +2456,7 @@ function applyTranslations() {
     'lbl-edit-cats-btn':   'edit_cats_btn',
     'lbl-add-cat-btn':     'add_cat_btn',
     'lbl-export-csv':      'export_csv_btn',
+    'lbl-import-csv-btn':  'import_csv_btn',
     'qa-title1':           'add_expense_title',
     'qa-save-btn':         'save_btn',
     // Nav picker save button
@@ -5775,7 +5780,10 @@ function exportCSV() {
     t.fxCurrency || '',
   ].map(esc).join(','));
 
-  const csv = [header.map(esc).join(','), ...rows].join('\n');
+  // BOM + CRLF row endings so Excel/Sheets/Numbers reliably split rows and columns
+  // (a bare "\n" or missing BOM is what makes some spreadsheet apps dump everything
+  // into a single cell/column instead of one row per entry).
+  const csv = '\uFEFF' + [header.map(esc).join(','), ...rows].join('\r\n');
   const filename = 'daftar-expenses-' + todayStr() + '.csv';
 
   downloadOrShowCopyModal(
@@ -5878,6 +5886,92 @@ function importData(event) {
       renderDashboard();
       showToast(t('import_ok'));
     } catch(err) {
+      showToast(t('import_fail'));
+    }
+    event.target.value = ''; // reset input
+  };
+  reader.readAsText(file);
+}
+
+// Proper RFC4180-style CSV parser — handles quoted fields (with embedded commas,
+// quotes, and newlines) and either \n or \r\n row endings, matching what exportCSV()
+// produces and what Excel/Sheets/Numbers save when a person edits & re-saves the file.
+function parseCSVText(text) {
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1); // strip BOM if present
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i+1] === '"') { field += '"'; i++; }
+        else inQuotes = false;
+      } else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\r') { /* ignore — \n (or end) closes the row */ }
+      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+      else field += c;
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows.filter(r => !(r.length === 1 && r[0] === ''));
+}
+
+// Imports a CSV in the same shape exportCSV() produces:
+// Date, Category, Amount, Currency, Note, Place, Foreign Amount, Foreign Currency
+// This ADDS the rows as new expense entries — it never touches or replaces existing data.
+function importCSV(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const rows = parseCSVText(String(e.target.result || ''));
+      if (!rows.length) { showToast(t('invalid_file')); event.target.value = ''; return; }
+
+      let dataRows = rows;
+      if ((rows[0][0] || '').trim().toLowerCase() === 'date') dataRows = rows.slice(1);
+
+      // Map both English and Arabic category labels back to a category id
+      const catByLabel = {};
+      allCats().forEach(c => {
+        if (c.label)   catByLabel[c.label.trim().toLowerCase()]   = c.id;
+        if (c.labelAr) catByLabel[c.labelAr.trim().toLowerCase()] = c.id;
+      });
+
+      let imported = 0, skipped = 0;
+      const newTx = [];
+      dataRows.forEach((r, i) => {
+        const [date, catText, amount, , note, place, fxAmount, fxCurrency] = r;
+        const d = (date || '').trim();
+        const amt = parseFloat(amount);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || isNaN(amt) || amt <= 0) { skipped++; return; }
+        const catId = catByLabel[(catText || '').trim().toLowerCase()] || 'misc';
+        const tx = { id: 'tx_csv_' + Date.now() + '_' + i, date: d, category: catId, amount: amt };
+        if (note && note.trim())  tx.note  = note.trim();
+        if (place && place.trim()) tx.place = place.trim();
+        const fxAmt = parseFloat(fxAmount);
+        if (fxCurrency && fxCurrency.trim() && !isNaN(fxAmt) && fxAmt > 0) {
+          tx.fxAmount = fxAmt; tx.fxCurrency = fxCurrency.trim();
+        }
+        newTx.push(tx);
+        imported++;
+      });
+
+      if (!imported) { showToast(t('invalid_file')); event.target.value = ''; return; }
+
+      const msg = currentLang === 'ar'
+        ? `استيراد ${imported} عملية كمصاريف جديدة؟${skipped ? ` (تم تجاهل ${skipped} صف غير صالح)` : ''} لن يتم حذف أو استبدال بياناتك الحالية.`
+        : `Import ${imported} entries as new expenses?${skipped ? ` (${skipped} invalid rows skipped)` : ''} Your existing data won't be deleted or replaced.`;
+      if (!window.confirm(msg)) { event.target.value = ''; return; }
+
+      txData.push(...newTx);
+      saveTx();
+      renderDashboard();
+      showToast(t('import_ok'));
+    } catch (err) {
       showToast(t('import_fail'));
     }
     event.target.value = ''; // reset input
@@ -6064,24 +6158,32 @@ function skipOnboarding() {
 function openMonthPicker(context) {
   const current = context==='dashboard' ? dashMonth : context==='budget' ? budgetMonth : expMonth;
   const [curYr, curMo] = current.split('-').map(Number);
+  const thisYear = new Date().getFullYear();
 
-  // Collect all years that have any data, plus current year
+  // Year dropdown always spans a wide range (not just years that already have data),
+  // so the person can pick any past year even before they've logged anything in it.
   const allDates = [
     ...fuelData.map(f=>f.date),
     ...svcData.map(s=>s.date),
     ...txData.map(t=>t.date),
   ];
-  const years = new Set([new Date().getFullYear()]);
+  const years = new Set();
+  for (let y = thisYear - 10; y <= thisYear; y++) years.add(y);
   allDates.forEach(d => years.add(parseInt(d.split('-')[0])));
+  years.add(curYr);
   const yearList = [...years].sort((a,b)=>b-a);
 
   const todayMk = getMK(todayStr());
 
   document.getElementById('modal-title').textContent = currentLang==='ar' ? 'اختر الشهر' : 'Select Month';
   document.getElementById('modal-body').innerHTML = `
-    <div style="display:flex;gap:8px;overflow-x:auto;margin-bottom:16px;scrollbar-width:none;padding-bottom:4px" id="mp-year-row">
-      ${yearList.map(y => `<button onclick="mpSelectYear(${y},'${context}')" id="mp-yr-${y}"
-        style="flex-shrink:0;padding:8px 16px;border-radius:20px;border:1px solid ${y===curYr?'var(--gold)':'var(--border)'};background:${y===curYr?'var(--gold)':'var(--surface2)'};color:${y===curYr?'#0a0a0b':'var(--text-dim)'};font-size:13px;font-weight:700;cursor:pointer">${y}</button>`).join('')}
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <select id="mp-year-select" onchange="mpSelectYear(parseInt(this.value,10),'${context}')"
+        style="flex:1;min-width:0;padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:14px;font-weight:700;-webkit-appearance:none;appearance:none">
+        ${yearList.map(y => `<option value="${y}" ${y===curYr?'selected':''}>${y}</option>`).join('')}
+      </select>
+      <button onclick="mpJumpToday('${context}')"
+        style="flex-shrink:0;padding:10px 14px;border-radius:var(--r-sm);border:1px solid var(--gold-dim,var(--gold));background:var(--gold-glow);color:var(--gold);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">${currentLang==='ar'?'↺ هذا الشهر':'↺ This Month'}</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px" id="mp-month-grid">
       ${MONTHS.map((_,i) => { const m = monthName(i);
@@ -6101,12 +6203,6 @@ function openMonthPicker(context) {
 function mpSelectYear(y, context) {
   window._mpYear = y;
   const todayMk = getMK(todayStr());
-  document.querySelectorAll('#mp-year-row button').forEach(b=>{
-    const isY = b.id === 'mp-yr-'+y;
-    b.style.borderColor = isY ? 'var(--gold)' : 'var(--border)';
-    b.style.background  = isY ? 'var(--gold)' : 'var(--surface2)';
-    b.style.color        = isY ? '#0a0a0b' : 'var(--text-dim)';
-  });
   const current = context==='dashboard' ? dashMonth : context==='budget' ? budgetMonth : expMonth;
   document.getElementById('mp-month-grid').innerHTML = MONTHS.map((_,i) => { const m = monthName(i);
     const mk = y + '-' + String(i+1).padStart(2,'0');
@@ -6115,6 +6211,12 @@ function mpSelectYear(y, context) {
     return `<button ${isFuture?'disabled':''} onclick="mpSelectMonth('${mk}','${context}')"
       style="padding:12px 4px;border-radius:var(--r-sm);border:1px solid ${isSelected?'var(--gold)':'var(--border)'};background:${isSelected?'var(--gold-glow)':'var(--surface2)'};color:${isFuture?'var(--text-mute)':(isSelected?'var(--gold)':'var(--text)')};font-size:13px;font-weight:${isSelected?'700':'600'};cursor:${isFuture?'default':'pointer'};opacity:${isFuture?'0.4':'1'}">${m}</button>`;
   }).join('');
+}
+
+// Jump straight back to the current real-world month, without hunting through the picker.
+function mpJumpToday(context) {
+  const todayMk = getMK(todayStr());
+  mpSelectMonth(todayMk, context);
 }
 
 function mpSelectMonth(mk, context) {
