@@ -5943,20 +5943,35 @@ function importCSV(event) {
 
       let imported = 0, skipped = 0;
       const newTx = [];
+      const newFuel = [];
+      const newSvc = [];
       dataRows.forEach((r, i) => {
         const [date, catText, amount, , note, place, fxAmount, fxCurrency] = r;
         const d = (date || '').trim();
         const amt = parseFloat(amount);
         if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || isNaN(amt) || amt <= 0) { skipped++; return; }
         const catId = catByLabel[(catText || '').trim().toLowerCase()] || 'misc';
-        const tx = { id: 'tx_csv_' + Date.now() + '_' + i, date: d, category: catId, amount: amt };
-        if (note && note.trim())  tx.note  = note.trim();
-        if (place && place.trim()) tx.place = place.trim();
-        const fxAmt = parseFloat(fxAmount);
-        if (fxCurrency && fxCurrency.trim() && !isNaN(fxAmt) && fxAmt > 0) {
-          tx.fxAmount = fxAmt; tx.fxCurrency = fxCurrency.trim();
+        const noteVal = (note || '').trim();
+        const placeVal = (place || '').trim();
+
+        // Fuel and Maintenance route into their own dedicated trackers (not the generic
+        // transaction log) so they show up correctly on the Fuel/Maintenance pages —
+        // those pages read from fuelData/svcData directly, same as fuel/maintenance
+        // entries added through their own forms.
+        if (catId === 'fuel') {
+          newFuel.push({ date: d, type: noteVal, station: placeVal, amount: amt });
+        } else if (catId === 'maintenance') {
+          newSvc.push({ name: noteVal || 'Maintenance', km: settings.currentKM || 0, date: d, cost: amt, from: placeVal });
+        } else {
+          const tx = { id: 'tx_csv_' + Date.now() + '_' + i, date: d, category: catId, amount: amt };
+          if (noteVal)  tx.note  = noteVal;
+          if (placeVal) tx.place = placeVal;
+          const fxAmt = parseFloat(fxAmount);
+          if (fxCurrency && fxCurrency.trim() && !isNaN(fxAmt) && fxAmt > 0) {
+            tx.fxAmount = fxAmt; tx.fxCurrency = fxCurrency.trim();
+          }
+          newTx.push(tx);
         }
-        newTx.push(tx);
         imported++;
       });
 
@@ -5967,9 +5982,16 @@ function importCSV(event) {
         : `Import ${imported} entries as new expenses?${skipped ? ` (${skipped} invalid rows skipped)` : ''} Your existing data won't be deleted or replaced.`;
       if (!window.confirm(msg)) { event.target.value = ''; return; }
 
-      txData.push(...newTx);
-      saveTx();
+      if (newTx.length)   { txData.push(...newTx); saveTx(); }
+      if (newFuel.length) { fuelData.push(...newFuel); fuelData.sort((a,b)=>a.date.localeCompare(b.date)); saveFuel(); }
+      if (newSvc.length)  { svcData.push(...newSvc); svcData.sort((a,b)=>a.date.localeCompare(b.date)); saveSvc(); }
+
       renderDashboard();
+      if (currentPage === 'fuel')        renderFuel();
+      if (currentPage === 'maintenance') renderMaintenance();
+      if (currentPage === 'expenses')    renderExpenses();
+      if (currentPage === 'budget')      renderBudget();
+      if (currentPage === 'insights')    renderInsights();
       showToast(t('import_ok'));
     } catch (err) {
       showToast(t('import_fail'));
@@ -6834,6 +6856,30 @@ document.addEventListener('DOMContentLoaded',()=>{
   applyTranslations();
   applyTrackerVisibility();
   renderNav();
+  // One-time migration: move CSV-imported Fuel/Maintenance rows that were dropped into the
+  // generic transaction log (by an earlier version of importCSV) into their proper trackers,
+  // so they show up on the Fuel/Maintenance pages instead of only the Dashboard.
+  if (!localStorage.getItem('csv_fuel_svc_migration_done')) {
+    const stray = txData.filter(x => x.id && x.id.indexOf('tx_csv_') === 0 && (x.category === 'fuel' || x.category === 'maintenance'));
+    if (stray.length) {
+      const strayFuel = stray.filter(x => x.category === 'fuel');
+      const straySvc  = stray.filter(x => x.category === 'maintenance');
+      if (strayFuel.length) {
+        fuelData.push(...strayFuel.map(x => ({ date: x.date, type: x.note || '', station: x.place || '', amount: x.amount })));
+        fuelData.sort((a,b)=>a.date.localeCompare(b.date));
+        saveFuel();
+      }
+      if (straySvc.length) {
+        svcData.push(...straySvc.map(x => ({ name: x.note || 'Maintenance', km: settings.currentKM || 0, date: x.date, cost: x.amount, from: x.place || '' })));
+        svcData.sort((a,b)=>a.date.localeCompare(b.date));
+        saveSvc();
+      }
+      const strayIds = new Set(stray.map(x => x.id));
+      txData = txData.filter(x => !strayIds.has(x.id));
+      saveTx();
+    }
+    localStorage.setItem('csv_fuel_svc_migration_done', '1');
+  }
   // One-time migration: clear stale default values that were hardcoded before onboarding
   if (settings.salary === 8700 && !localStorage.getItem('ob_done')) {
     settings.salary = 0; saveSettings2();
