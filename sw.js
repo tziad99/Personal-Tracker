@@ -1,4 +1,4 @@
-const CACHE = 'daftar-v40';
+const CACHE = 'daftar-v41';
 const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {

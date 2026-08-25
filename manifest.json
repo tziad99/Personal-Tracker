@@ -1,7 +1,7 @@
 {
   "name": "Daftar | دفتر",
   "short_name": "Daftar",
-  "description": "دفترك الشخصي — Your personal finance, fuel & car tracker",
+  "description": "دفترك الشخصي — A personal finance notebook for tracking expenses, budgets & savings",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0a0a0b",
